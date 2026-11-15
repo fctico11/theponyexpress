@@ -2,9 +2,9 @@
 // TODO: not connected to a mailing list yet. Replace the body of `subscribe`
 // with a call to your provider (Mailchimp, Buttondown, ConvertKit, etc.).
 async function subscribe(email) {
-  const list = JSON.parse(localStorage.getItem("pony-waitlist") || "[]");
+  const list = JSON.parse(localStorage.getItem("zebra-waitlist") || "[]");
   if (!list.includes(email)) list.push(email);
-  localStorage.setItem("pony-waitlist", JSON.stringify(list));
+  localStorage.setItem("zebra-waitlist", JSON.stringify(list));
 }
 
 const form = document.getElementById("signup");
