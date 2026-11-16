@@ -186,7 +186,9 @@ a { color: inherit; }
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.site-header nav a:not(.btn) { text-decoration: none; padding: 0.5rem 0; }
+.site-header nav a:not(.btn) { text-decoration: none; padding: 0.5rem 0; white-space: nowrap; }
+@media (max-width: 1000px) { .site-header nav a:not(.btn) { display: none; } }
+@media (max-width: 1150px) { .bpm { display: none; } .site-header nav { gap: clamp(0.8rem, 1.6vw, 2rem); } }
 .site-header nav a:not(.btn):hover { color: var(--acid); }
 
 /* ---------- Hero ---------- */
@@ -697,6 +699,14 @@ a { color: inherit; }
   color: var(--dim);
   padding-inline: 1rem;
 }
+.dance__controls { display: flex; flex-wrap: wrap; align-items: center; gap: 1.5rem 2rem; margin-top: 1.75rem; }
+.dance__controls[hidden] { display: none; }
+.dance__speed { display: grid; gap: 0.45rem; min-width: min(100%, 14rem); font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.dance__speed output { color: var(--acid); margin-left: 0.4em; }
+.dance__speed input { width: 100%; accent-color: var(--acid); cursor: pointer; }
+.dance__ends { display: flex; justify-content: space-between; color: var(--dim); font-size: 0.7rem; }
+.dance__ends i { font-style: normal; }
+
 @media (max-width: 860px) {
   .dance { grid-template-columns: 1fr; }
   .dance__stage { max-width: 30rem; margin-right: 16px; width: calc(100% - 16px); }
@@ -1012,4 +1022,116 @@ a { color: inherit; }
   .beads__row > * { animation: none; }
   .product:hover { transform: none; }
   .product:hover .product__art svg { transform: none; }
+}
+
+/* ==========================================================================
+   The Dancefloor
+   ========================================================================== */
+
+.floor-hero {
+  position: relative;
+  min-height: min(calc(100vh - 3.5rem), 48rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.5rem;
+  padding: clamp(3rem, 7vw, 6rem) var(--pad);
+  overflow: hidden;
+}
+.floor-hero > .tag, .floor-hero .lede { background: var(--ink); padding: 0.5rem 0.8rem; }
+.floor-hero .lede { padding: 0.9rem 1.1rem; max-width: 32rem; }
+.floor-hero .hero__actions { justify-content: center; }
+
+/* Headline as a neon sign: tube outline, glow, the odd flicker. */
+.neon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.95;
+  color: var(--white);
+  -webkit-text-stroke: 0;
+  background: rgb(5 5 6 / 0.82);
+  border: 3px solid var(--pink);
+  border-radius: 1.25rem;
+  padding: 0.35em 0.5em 0.4em;
+  font-size: clamp(1.9rem, 9.4vw, 8rem);
+  letter-spacing: -0.03em;
+  box-shadow: 0 0 0.25em var(--pink), 0 0 0.9em rgb(255 42 147 / 0.55), inset 0 0 0.35em rgb(255 42 147 / 0.5);
+  transform: rotate(-2deg);
+}
+.neon span:first-child {
+  font-size: 0.42em;
+  letter-spacing: 0.3em;
+  margin-right: -0.3em;
+  color: var(--cyan);
+  text-shadow: 0 0 0.25em var(--cyan), 0 0 0.9em var(--cyan);
+}
+.neon span:last-child {
+  text-shadow: 0 0 0.08em #fff, 0 0 0.3em var(--acid), 0 0 0.75em var(--acid), 0 0 1.4em rgb(198 255 31 / 0.6);
+  animation: flicker calc(var(--beat) * 16) linear infinite;
+}
+@keyframes flicker {
+  0%, 46%, 48%, 52%, 100% { opacity: 1; }
+  47%, 51% { opacity: 0.55; }
+}
+
+.rooms { background: var(--ink); padding: clamp(4rem, 9vw, 8rem) var(--pad); }
+.rooms__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+.room {
+  --c: var(--acid);
+  background: var(--ink-2);
+  border: 2px solid var(--line);
+  border-top: 6px solid var(--c);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.room:nth-child(2) { --c: var(--pink); }
+.room:nth-child(3) { --c: var(--cyan); }
+.room__sign { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c); }
+.room > p:not(.room__sign) { color: var(--dim); }
+.room ul { list-style: none; margin: auto 0 0; padding: 0.9rem 0 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.room ul li {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--c);
+  color: var(--c);
+  padding: 0.35rem 0.6rem;
+}
+
+.rules { background: var(--ink-2); border-top: 1px solid var(--line); padding: clamp(4rem, 9vw, 7rem) var(--pad); }
+.rules__list { list-style: none; margin: 0; padding: 0; max-width: 46rem; counter-reset: rule; }
+.rules__list li {
+  counter-increment: rule;
+  position: relative;
+  padding: 1.1rem 0 1.1rem 3rem;
+  border-top: 1px solid var(--line);
+  color: var(--dim);
+}
+.rules__list li::before {
+  content: "0" counter(rule);
+  position: absolute;
+  left: 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--pink);
+  padding-top: 0.2em;
+}
+.rules__list li > strong { color: var(--white); }
+
+@media (prefers-reduced-motion: reduce) {
+  .neon span:last-child { animation: none; }
 }

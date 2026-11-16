@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Dancefloor — The Zebra Express</title>
+  <meta name="description" content="The Dancefloor is the members-only room of The Zebra Express: talk tunes, share your work, and spread a little PLUR.">
+  <!-- Social share card. The image URL must be absolute: change the domain here if the site lives elsewhere. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The Zebra Express">
+  <meta property="og:title" content="The Dancefloor — The Zebra Express">
+  <meta property="og:description" content="The Dancefloor is the members-only room of The Zebra Express: talk tunes, share your work, and spread a little PLUR.">
+  <meta property="og:url" content="https://thezebraexpress.com/dancefloor.html">
+  <meta property="og:image" content="https://thezebraexpress.com/images/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Zebra Express: snail mail for ravers. Marty the zebra waves an envelope over psychedelic stripes.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#050506">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&family=Unbounded:wght@500;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <canvas id="trip" data-mode="floor" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="index.html" aria-label="The Zebra Express, home">
+      <img src="images/marty.webp" alt="" width="40" height="40">
+      <span>The Zebra Express</span>
+    </a>
+    <p class="bpm" aria-hidden="true"><i></i>140 BPM</p>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="dancefloor.html" aria-current="page">Dancefloor</a>
+      <a class="btn btn--small" href="index.html#join">Get on the route</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="floor-hero window" id="top">
+      <p class="tag">Members only</p>
+      <h1 class="neon"><span>The</span> <span>Dancefloor</span></h1>
+      <p class="lede">The room behind the mailbox. Talk tunes, show your work, spread a little PLUR.</p>
+      <div class="hero__actions">
+        <a class="btn" href="#door">How to get in</a>
+        <a class="btn btn--ghost" href="#rooms">Look inside</a>
+      </div>
+    </section>
+
+    <!-- ROOMS -->
+    <section class="rooms" id="rooms">
+      <div class="section-head">
+        <p class="tag">Three rooms, one floor</p>
+        <h2>What's inside</h2>
+      </div>
+      <ul class="rooms__list">
+        <li class="room">
+          <p class="room__sign">Room 01</p>
+          <h3>The Booth</h3>
+          <p>Talk tunes. Track IDs, sets you can't stop replaying, and arguments about the best closing track of all time.</p>
+          <ul>
+            <li>ID this track</li>
+            <li>Set of the week</li>
+            <li>What's in your rotation</li>
+          </ul>
+        </li>
+        <li class="room">
+          <p class="room__sign">Room 02</p>
+          <h3>The Gallery</h3>
+          <p>For artists. Share your mixes, flyers, visuals, kandi, perlers and totems, finished or not, and get honest ears and eyes on them.</p>
+          <ul>
+            <li>Mixes and originals</li>
+            <li>Works in progress</li>
+            <li>Kandi and perler builds</li>
+          </ul>
+        </li>
+        <li class="room">
+          <p class="room__sign">Room 03</p>
+          <h3>The Circle</h3>
+          <p>Spread PLUR. Shout someone out, find your people before a festival, and reunite lost things with their owners.</p>
+          <ul>
+            <li>Meetups and rave fam</li>
+            <li>Shoutouts</li>
+            <li>Lost and found</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <!-- DOOR -->
+    <section class="spot" id="door">
+      <div class="spot__head">
+        <p class="tag">At the door</p>
+        <h2>How to get in</h2>
+        <p>The Dancefloor is for members of the route. No guest list, no plus ones, no line.</p>
+      </div>
+
+      <ol class="spot__steps">
+        <li>
+          <span>1</span>
+          <h3>Get on the route</h3>
+          <p>Sign up for the monthly drop. That's the only ticket there is.</p>
+        </li>
+        <li>
+          <span>2</span>
+          <h3>Check your envelope</h3>
+          <p>Your key to the floor arrives with your first drop.</p>
+        </li>
+        <li>
+          <span>3</span>
+          <h3>Step in</h3>
+          <p>Say hi, pick a room, post a tune.</p>
+        </li>
+      </ol>
+
+      <p class="spot__fine">Doors aren't open yet. They open with Drop 001.</p>
+    </section>
+
+    <!-- RULES -->
+    <section class="rules" id="rules">
+      <div class="section-head">
+        <p class="tag">House rules</p>
+        <h2>Keep it PLUR</h2>
+      </div>
+      <ol class="rules__list">
+        <li><strong>Peace.</strong> Disagree about music all you like. Be kind about people.</li>
+        <li><strong>Love.</strong> Hype each other up. Somebody's first mix deserves a listen.</li>
+        <li><strong>Unity.</strong> Every genre, every scene, every age of raver is welcome here.</li>
+        <li><strong>Respect.</strong> Credit artists, ask before reposting, and no means no.</li>
+        <li><strong>Music first.</strong> No spam, no sourcing, no selling tickets above face.</li>
+      </ol>
+    </section>
+
+    <!-- CTA -->
+    <section class="join window">
+      <div class="join__card">
+        <p class="tag">The only ticket</p>
+        <h2>Get on the route</h2>
+        <p>Members get the monthly drop in the mail and a place on the Dancefloor.</p>
+        <p><a class="btn" href="index.html#join">Join the route</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer__big">See you on the <span class="hl">floor</span>.</p>
+    <nav aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
+      <a href="index.html#join">Join</a>
+    </nav>
+    <p class="footer__fine">© 2026 The Zebra Express. The Dancefloor isn't open yet.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -25,7 +25,7 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <canvas id="trip" data-mode="spiral" aria-hidden="true"></canvas>
+  <canvas id="trip" data-mode="pyro" aria-hidden="true"></canvas>
 
   <header class="site-header">
     <a class="wordmark" href="index.html" aria-label="The Zebra Express, home">
@@ -38,6 +38,7 @@
       <a href="#spot">Spot Marty</a>
       <a href="#tour">Where he'll be</a>
       <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
       <a class="btn btn--small" href="index.html#join">Get on the route</a>
     </nav>
   </header>
@@ -100,8 +101,16 @@
       <div class="dance__copy">
         <p class="tag">Caught on the floor</p>
         <h2>He shuffles.</h2>
-        <p>Give him four counts and some room. Drag to spin him round.</p>
-        <p><button class="btn btn--ghost" id="dance-toggle" type="button" hidden>Pause</button></p>
+        <p>Give him four counts and some room. Drag to spin him round, and set the tempo yourself.</p>
+        <div class="dance__controls" id="dance-controls" hidden>
+          <button class="btn btn--ghost" id="dance-toggle" type="button">Pause</button>
+          <label class="dance__speed">
+            <span>Tempo <output id="dance-speed-out" for="dance-speed">1×</output></span>
+            <input type="range" id="dance-speed" min="0.25" max="2.5" step="0.25" value="1" list="dance-speeds">
+            <span class="dance__ends" aria-hidden="true"><i>Slower</i><i>Faster</i></span>
+          </label>
+          <datalist id="dance-speeds"><option value="1"></option></datalist>
+        </div>
       </div>
       <div class="dance__stage" id="dance-stage" tabindex="0" role="img" aria-label="A 3D animation of Marty the zebra doing a shuffle dance. Use the left and right arrow keys to turn him.">
         <p class="dance__status" id="dance-status" role="status">Marty's warming up…</p>
@@ -183,6 +192,7 @@
       <a href="#spot">Spot Marty</a>
       <a href="#tour">Where he'll be</a>
       <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
       <a href="index.html#join">Join</a>
     </nav>
     <p class="footer__fine">© 2026 The Zebra Express.</p>

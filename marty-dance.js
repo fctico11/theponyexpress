@@ -6,6 +6,47 @@ import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 const stage = document.getElementById("dance-stage");
 const toggle = document.getElementById("dance-toggle");
 const status = document.getElementById("dance-status");
+const speed = document.getElementById("dance-speed");
+const speedOut = document.getElementById("dance-speed-out");
+const controls = document.getElementById("dance-controls");
+
+// The source clip starts and ends with Marty standing still. We keep only the
+// shuffling in the middle (frames at 30 per second) and ease the last few
+// frames back into the first so it repeats without a jump.
+const LOOP = { from: 30, to: 125, blend: 10 };
+
+function loopClip(clip) {
+  const length = LOOP.to - LOOP.from;
+  const tracks = clip.tracks.map((track) => {
+    const size = track.getValueSize();
+    const src = track.values;
+    if (track.times.length <= LOOP.to || LOOP.from < LOOP.blend) return track;
+    const step = track.times[1] - track.times[0];
+    const isRotation = track instanceof THREE.QuaternionKeyframeTrack;
+    const times = new Float32Array(length + 1);
+    const values = new Float32Array((length + 1) * size);
+    for (let j = 0; j <= length; j++) {
+      const at = (LOOP.from + j) * size;
+      times[j] = j * step;
+      const k = j - (length - LOOP.blend);
+      if (k <= 0) {
+        for (let c = 0; c < size; c++) values[j * size + c] = src[at + c];
+        continue;
+      }
+      // Blend towards the frames that lead into the loop's first frame.
+      const t = k / LOOP.blend;
+      const w = t * t * (3 - 2 * t);
+      const lead = (LOOP.from - LOOP.blend + k) * size;
+      if (isRotation) {
+        THREE.Quaternion.slerpFlat(values, j * size, src, at, src, lead, w);
+      } else {
+        for (let c = 0; c < size; c++) values[j * size + c] = src[at + c] + (src[lead + c] - src[at + c]) * w;
+      }
+    }
+    return new track.constructor(track.name, times, values);
+  });
+  return new THREE.AnimationClip("shuffle-loop", -1, tracks);
+}
 
 if (stage) {
   const still = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -33,7 +74,7 @@ if (stage) {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
-    camera.position.set(0, 1.15, 5.2);
+    camera.position.set(0, 1.15, 5.9);
     camera.lookAt(0, 1.0, 0);
 
     // House lights: soft white from the front, pink and cyan from the wings.
@@ -88,6 +129,12 @@ if (stage) {
     }).observe(stage);
     document.addEventListener("visibilitychange", sync);
     toggle.addEventListener("click", () => { playing = !playing; sync(); });
+    function setSpeed() {
+      const rate = Number(speed.value) || 1;
+      if (mixer) mixer.timeScale = rate;
+      speedOut.textContent = `${rate}×`;
+    }
+    speed.addEventListener("input", setSpeed);
 
     // Drag (or arrow keys) to turn him round.
     let dragX = null;
@@ -112,20 +159,10 @@ if (stage) {
       model.children.filter((c) => c.isCamera || c.isLight).forEach((c) => model.remove(c));
       model.traverse((o) => { if (o.isSkinnedMesh) o.frustumCulled = false; });
 
-      const clip = model.animations[0];
+      const clip = model.animations[0] && loopClip(model.animations[0]);
       if (clip) {
-        // Keep him on the spot: remove any steady drift from the hips so the loop doesn't wander off.
-        for (const track of clip.tracks) {
-          if (!/Hips\.position$/.test(track.name)) continue;
-          const v = track.values;
-          const n = v.length / 3;
-          for (const axis of [0, 2]) {
-            const first = v[axis];
-            const drift = v[(n - 1) * 3 + axis] - first;
-            for (let i = 0; i < n; i++) v[i * 3 + axis] -= (drift * i) / (n - 1 || 1);
-          }
-        }
         mixer = new THREE.AnimationMixer(model);
+        mixer.timeScale = Number(speed.value) || 1;
         mixer.clipAction(clip).play();
         mixer.update(still.matches ? 0.6 : 0);
       }
@@ -145,7 +182,8 @@ if (stage) {
 
       stage.classList.add("is-ready");
       status.textContent = "";
-      toggle.hidden = false;
+      controls.hidden = false;
+      setSpeed();
       renderer.render(scene, camera);
       sync();
     }, undefined, () => {
