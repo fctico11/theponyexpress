@@ -588,7 +588,7 @@ a { color: inherit; }
   display: flex;
   justify-content: center;
   margin-top: -0.02em;
-  font-size: clamp(4rem, min(19vw, 23vh), 19rem);
+  font-size: clamp(4rem, min(19vw, 21vh), 19rem);
   line-height: 0.85;
   letter-spacing: -0.04em;
   color: var(--white);
@@ -616,9 +616,10 @@ a { color: inherit; }
 .disc {
   position: relative;
   z-index: 2;
-  width: clamp(13rem, min(58vw, 30vh), 27rem);
+  width: clamp(13rem, min(58vw, 27vh), 27rem);
   aspect-ratio: 1;
-  margin-top: clamp(-4rem, -4vw, -1.5rem);
+  /* Clears the name's drop shadow plus the disc's own outer rings. */
+  margin-top: calc(24px + clamp(1.75rem, 3.5vw, 3.5rem));
   border-radius: 50%;
   background: var(--ink);
   border: 3px solid var(--acid);
@@ -644,7 +645,7 @@ a { color: inherit; }
   animation: bob calc(var(--beat) * 4) ease-in-out infinite;
 }
 
-.vortex .lede { margin-top: 2.75rem; max-width: 34rem; }
+.vortex .lede { margin-top: calc(24px + 1.25rem); max-width: 34rem; }
 .vortex .hero__actions { justify-content: center; margin-top: 1.75rem; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -800,7 +801,7 @@ a { color: inherit; }
 @media (max-width: 860px) {
   /* On small screens the name is short, so the disc sits below it instead of overlapping. */
   .vortex__name { font-size: clamp(3rem, 17vw, 9rem); }
-  .disc { margin-top: 1.75rem; width: clamp(13rem, min(62vw, 34vh), 20rem); }
+  .disc { margin-top: calc(24px + 1.5rem); width: clamp(13rem, min(62vw, 34vh), 20rem); }
 }
 
 
@@ -810,15 +811,86 @@ a { color: inherit; }
 
 .shop-hero {
   position: relative;
+  min-height: min(calc(100vh - 3.5rem), 46rem);
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 1.5rem;
-  padding: clamp(3.5rem, 8vw, 7rem) var(--pad);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.75rem;
+  padding: clamp(3rem, 7vw, 6rem) var(--pad);
   overflow: hidden;
 }
 .shop-hero > .tag, .shop-hero .lede { background: var(--ink); padding: 0.5rem 0.8rem; }
-.shop-hero .lede { padding: 0.9rem 1.1rem; }
+.shop-hero .lede { padding: 0.9rem 1.1rem; max-width: 34rem; }
+
+/* Headline spelled in kandi letter beads, two strands. */
+.beads {
+  --bead: min(8.4vw, 13vh, 7.25rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--bead) * 0.3);
+}
+.beads__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--bead) * 0.07);
+  padding-inline: calc(var(--bead) * 0.6);
+}
+/* the string */
+.beads__row::before {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto;
+  height: max(3px, calc(var(--bead) * 0.07));
+  transform: translateY(-50%);
+  background: var(--white);
+  box-shadow: 0 0 0 max(2px, calc(var(--bead) * 0.04)) var(--ink);
+  border-radius: 99px;
+}
+.beads__row:nth-child(1) { transform: rotate(-3deg); }
+.beads__row:nth-child(2) { transform: rotate(2deg); }
+.beads__row > * {
+  position: relative;
+  flex: none;
+  width: var(--bead);
+  height: var(--bead);
+  display: grid;
+  place-items: center;
+  border: max(2px, calc(var(--bead) * 0.05)) solid var(--ink);
+  box-shadow: calc(var(--bead) * 0.07) calc(var(--bead) * 0.07) 0 var(--ink);
+  animation: jiggle calc(var(--beat) * 4) ease-in-out infinite;
+}
+.beads__row > :nth-child(2n) { animation-delay: calc(var(--beat) * -2); }
+.beads__row > :nth-child(3n) { animation-delay: calc(var(--beat) * -1); }
+.beads b {
+  border-radius: 22%;
+  background: linear-gradient(145deg, #fff 0%, var(--white) 45%, #cfccc2 100%);
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: calc(var(--bead) * 0.6);
+  line-height: 1;
+}
+.beads i {
+  border-radius: 50%;
+  width: calc(var(--bead) * 0.86);
+  height: calc(var(--bead) * 0.86);
+  background:
+    radial-gradient(circle at 32% 30%, rgb(255 255 255 / 0.85) 0 9%, transparent 11%),
+    radial-gradient(circle at 60% 65%, transparent 0 45%, rgb(0 0 0 / 0.28) 100%),
+    var(--c, var(--pink));
+}
+.beads .c-acid { --c: var(--acid); }
+.beads .c-pink { --c: var(--pink); }
+.beads .c-uv { --c: var(--uv); }
+.beads .c-cyan { --c: var(--cyan); }
+@keyframes jiggle {
+  0%, 100% { transform: translateY(-4%) rotate(-2.5deg); }
+  50% { transform: translateY(4%) rotate(2.5deg); }
+}
 
 .shop { background: var(--ink); padding: clamp(4rem, 9vw, 8rem) var(--pad); }
 
@@ -887,6 +959,7 @@ a { color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .product, .product__art svg { transition: none; }
+  .beads__row > * { animation: none; }
   .product:hover { transform: none; }
   .product:hover .product__art svg { transform: none; }
 }

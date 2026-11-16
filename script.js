@@ -47,7 +47,7 @@ if (input) input.addEventListener("input", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Background: slow zebra stripes drawn with WebGL, warped (home) or spiral (Marty).
+// Background: slow zebra stripes drawn with WebGL, warped (home), spiral (Marty) or a bead pegboard (shop).
 // Falls back to the CSS gradient on #trip if WebGL isn't available.
 // ---------------------------------------------------------------------------
 (function trip() {
@@ -73,7 +73,19 @@ if (input) input.addEventListener("input", () => {
       float k1;
       float k2;
 
-      if (u_mode > 0.5) {
+      if (u_mode > 1.5) {
+        // Beads: a pegboard of fused beads, size and colour rippling outward.
+        p += (u_mouse - 0.5) * 0.12;
+        vec2 g = p * 9.0;
+        vec2 id = floor(g);
+        vec2 q = fract(g) - 0.5;
+        float d = length(q);
+        float ring = length(id + 0.5);
+        float size = 0.36 + 0.1 * sin(ring * 0.6 - t * 5.0);
+        band = (1.0 - smoothstep(size - 0.05, size, d)) * smoothstep(0.07, 0.12, d);
+        k1 = 0.5 + 0.5 * sin(id.x * 0.45 + id.y * 0.3 + t * 2.0);
+        k2 = 0.5 + 0.5 * sin(ring * 0.45 - t * 1.6);
+      } else if (u_mode > 0.5) {
         // Spiral: four striped arms winding slowly into the centre.
         p += (u_mouse - 0.5) * 0.25;
         float r = length(p) + 0.0001;
@@ -131,8 +143,8 @@ if (input) input.addEventListener("input", () => {
   const uRes = gl.getUniformLocation(prog, "u_res");
   const uTime = gl.getUniformLocation(prog, "u_time");
   const uMouse = gl.getUniformLocation(prog, "u_mouse");
-  // <canvas id="trip" data-mode="spiral"> switches the pattern.
-  gl.uniform1f(gl.getUniformLocation(prog, "u_mode"), canvas.dataset.mode === "spiral" ? 1 : 0);
+  // <canvas id="trip" data-mode="spiral"> or "beads" switches the pattern.
+  gl.uniform1f(gl.getUniformLocation(prog, "u_mode"), ({ spiral: 1, beads: 2 })[canvas.dataset.mode] || 0);
 
   const mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
   window.addEventListener("pointermove", (e) => {
