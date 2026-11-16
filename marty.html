@@ -96,6 +96,18 @@
     </section>
 
     <!-- SPOT MARTY -->
+    <section class="dance" id="dance">
+      <div class="dance__copy">
+        <p class="tag">Caught on the floor</p>
+        <h2>He shuffles.</h2>
+        <p>Give him four counts and some room. Drag to spin him round.</p>
+        <p><button class="btn btn--ghost" id="dance-toggle" type="button" hidden>Pause</button></p>
+      </div>
+      <div class="dance__stage" id="dance-stage" tabindex="0" role="img" aria-label="A 3D animation of Marty the zebra doing a shuffle dance. Use the left and right arrow keys to turn him.">
+        <p class="dance__status" id="dance-status" role="status">Marty's warming up…</p>
+      </div>
+    </section>
+
     <section class="spot" id="spot">
       <div class="spot__head">
         <p class="tag">Bounty</p>
@@ -176,6 +188,13 @@
     <p class="footer__fine">© 2026 The Zebra Express.</p>
   </footer>
 
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="marty-dance.js"></script>
   <script src="marty-data.js"></script>
   <script src="marty.js"></script>
   <script src="script.js"></script>
