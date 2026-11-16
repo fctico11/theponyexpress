@@ -22,6 +22,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 4.5rem; /* keep anchored sections clear of the sticky header */
   overflow-x: clip;
   background: var(--ink);
 }
@@ -33,7 +34,8 @@ body {
   font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* No overflow here: it would turn body into a scroll box and stop the header sticking.
+     Sideways overflow is clipped on html instead. */
 }
 
 img { display: block; max-width: 100%; height: auto; }
@@ -188,6 +190,64 @@ a { color: inherit; }
 }
 .site-header nav a:not(.btn) { text-decoration: none; padding: 0.5rem 0; white-space: nowrap; }
 @media (max-width: 1000px) { .site-header nav a:not(.btn) { display: none; } }
+
+.site-header nav .nav__menu-only { display: none; }
+
+/* Phone and tablet menu. script.js builds the button and panel from the header's own links. */
+.nav-toggle {
+  display: none;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: var(--ink);
+  border: 2px solid var(--white);
+  cursor: pointer;
+}
+.nav-toggle span { width: 20px; height: 2px; background: var(--white); transition: transform 0.2s ease, opacity 0.2s ease; }
+.nav-toggle:focus-visible { outline: 3px solid var(--acid); outline-offset: 3px; }
+.is-open .nav-toggle { border-color: var(--acid); }
+.is-open .nav-toggle span { background: var(--acid); }
+.is-open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.is-open .nav-toggle span:nth-child(2) { opacity: 0; }
+.is-open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.site-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
+  overflow-y: auto;
+  padding: 0.5rem var(--pad) 1.5rem;
+  background: var(--ink);
+  border-top: 1px solid var(--line);
+  border-bottom: 2px solid var(--acid);
+  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.6);
+}
+.site-menu a {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.site-menu a:hover, .site-menu a:focus-visible { color: var(--acid); }
+.site-menu a[aria-current="page"] { color: var(--pink); }
+@media (max-width: 1000px) {
+  .nav-toggle { display: inline-flex; }
+  .is-open .site-menu { display: flex; }
+}
+@media (prefers-reduced-motion: reduce) { .nav-toggle span { transition: none; } }
+
 @media (max-width: 1150px) { .bpm { display: none; } .site-header nav { gap: clamp(0.8rem, 1.6vw, 2rem); } }
 .site-header nav a:not(.btn):hover { color: var(--acid); }
 
@@ -545,7 +605,7 @@ a { color: inherit; }
   .btn, .sets li, .frame, .marty__art img { transition: none; }
 }
 
-@media (max-width: 340px) {
+@media (max-width: 400px) {
   .wordmark span { display: none; }
 }
 

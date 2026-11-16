@@ -47,6 +47,51 @@ if (input) input.addEventListener("input", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Phone and tablet menu: a button that opens the header's links in a panel.
+// Without JavaScript the links are still in the footer of every page.
+// ---------------------------------------------------------------------------
+(function menu() {
+  const header = document.querySelector(".site-header");
+  const nav = header && header.querySelector("nav");
+  if (!nav) return;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "nav-toggle";
+  button.setAttribute("aria-controls", "site-menu");
+  button.innerHTML = "<span></span><span></span><span></span>";
+
+  const panel = document.createElement("div");
+  panel.className = "site-menu";
+  panel.id = "site-menu";
+  panel.setAttribute("role", "navigation");
+  panel.setAttribute("aria-label", "Menu");
+  nav.querySelectorAll("a").forEach((link) => {
+    const copy = link.cloneNode(true);
+    copy.removeAttribute("class");
+    panel.append(copy);
+  });
+
+  function set(open) {
+    header.classList.toggle("is-open", open);
+    button.setAttribute("aria-expanded", String(open));
+    button.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  }
+  set(false);
+  header.append(button, panel);
+
+  button.addEventListener("click", () => set(!header.classList.contains("is-open")));
+  panel.addEventListener("click", (event) => { if (event.target.closest("a")) set(false); });
+  document.addEventListener("click", (event) => { if (!header.contains(event.target)) set(false); });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !header.classList.contains("is-open")) return;
+    set(false);
+    button.focus();
+  });
+  window.matchMedia("(min-width: 1001px)").addEventListener("change", () => set(false));
+})();
+
+// ---------------------------------------------------------------------------
 // Background: slow zebra stripes drawn with WebGL, warped (home), lasers and fire (Marty), a bead pegboard (shop) or a lit floor (Dancefloor).
 // Falls back to the CSS gradient on #trip if WebGL isn't available.
 // ---------------------------------------------------------------------------
