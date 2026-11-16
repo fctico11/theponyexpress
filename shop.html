@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kandi and perler shop — The Zebra Express</title>
+  <meta name="description" content="Handmade kandi from The Zebra Express. Singles, stacks, cuffs and perlers, made to trade.">
+  <meta name="theme-color" content="#050506">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&family=Unbounded:wght@500;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <canvas id="trip" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="index.html" aria-label="The Zebra Express, home">
+      <img src="images/marty.webp" alt="" width="40" height="40">
+      <span>The Zebra Express</span>
+    </a>
+    <p class="bpm" aria-hidden="true"><i></i>140 BPM</p>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html" aria-current="page">Shop</a>
+      <a class="btn btn--small" href="index.html#join">Get on the route</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="shop-hero window" id="top">
+      <p class="tag">The kandi counter</p>
+      <h1>
+        <span class="strip">Made to</span>
+        <span class="strip strip--acid">trade.</span>
+      </h1>
+      <p class="lede">Kandi and perlers, made by hand. Wear it, stack it, then give it to someone at the front.</p>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="shop" id="kandi">
+      <div class="section-head">
+        <p class="tag">In stock soon</p>
+        <h2>Kandi</h2>
+      </div>
+      <ul class="products" id="products"></ul>
+      <noscript><p class="tour__empty">The shop needs JavaScript to load.</p></noscript>
+    </section>
+
+    <!-- PERLERS -->
+    <section class="shop shop--perlers" id="perlers-section">
+      <div class="section-head">
+        <p class="tag">Fused, not strung</p>
+        <h2>Perlers</h2>
+        <p class="lede">Pixel pieces, ironed flat. Each one comes on a strand so you can wear it or trade it.</p>
+      </div>
+      <ul class="products" id="perlers"></ul>
+    </section>
+
+    <!-- NOTES -->
+    <section class="shop-notes">
+      <ol class="chapters">
+        <li>
+          <span class="chapters__no">01</span>
+          <h3>Strung by hand</h3>
+          <p>Every piece is made one bead at a time, so no two come out quite the same.</p>
+        </li>
+        <li>
+          <span class="chapters__no">02</span>
+          <h3>Sent by zebra</h3>
+          <p>Orders go out in the same striped envelopes as the monthly drop.</p>
+        </li>
+        <li>
+          <span class="chapters__no">03</span>
+          <h3>Meant to leave you</h3>
+          <p>Kandi is for trading. Buy one to keep and one to give away.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- CTA -->
+    <section class="join window">
+      <div class="join__card">
+        <p class="tag">Free kandi exists</p>
+        <h2>Or find Marty</h2>
+        <p>Spot him at a rave, say hi, and he'll reach into his bag for you.</p>
+        <p><a class="btn" href="marty.html#tour">See where he'll be</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer__big">Trade you <span class="hl">later</span>.</p>
+    <nav aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="index.html#join">Join</a>
+    </nav>
+    <p class="footer__fine">© 2026 The Zebra Express. Products and prices are placeholders.</p>
+  </footer>
+
+  <script src="shop-data.js"></script>
+  <script src="shop.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marty — The Zebra Express</title>
+  <meta name="description" content="Marty is a zebra finger puppet who goes to raves and carries the mail for The Zebra Express. His story, where he's been, where he'll be next, and the surprise you get for spotting him.">
+  <meta name="theme-color" content="#050506">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&family=Unbounded:wght@500;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <canvas id="trip" data-mode="spiral" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="index.html" aria-label="The Zebra Express, home">
+      <img src="images/marty.webp" alt="" width="40" height="40">
+      <span>The Zebra Express</span>
+    </a>
+    <p class="bpm" aria-hidden="true"><i></i>140 BPM</p>
+    <nav aria-label="Main">
+      <a href="#story">Backstory</a>
+      <a href="#spot">Spot Marty</a>
+      <a href="#tour">Where he'll be</a>
+      <a href="shop.html">Shop</a>
+      <a class="btn btn--small" href="index.html#join">Get on the route</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="vortex window" id="top">
+      <p class="tag">Resident carrier · File ZE-M1</p>
+
+      <h1 aria-label="It ain't a party without Marty">
+        <span class="vortex__pre" aria-hidden="true">It ain't a party without</span>
+        <span class="vortex__name" aria-hidden="true"><span>M</span><span>A</span><span>R</span><span>T</span><span>Y</span></span>
+      </h1>
+
+      <div class="disc" aria-hidden="true">
+        <svg class="disc__ring" viewBox="0 0 400 400">
+          <defs><path id="ring" d="M200,200 m-172,0 a172,172 0 1,1 344,0 a172,172 0 1,1 -344,0"/></defs>
+          <text><textPath href="#ring" textLength="1068">SPOT HIM · GET LOOT · RESIDENT CARRIER · SPOT HIM · GET LOOT · FILE ZE-M1 ·</textPath></text>
+        </svg>
+        <img src="images/marty.webp" alt="" width="900" height="900">
+      </div>
+
+      <p class="lede">He's a zebra finger puppet. He goes to raves. People kept coming over to say hi, so we gave him a mail route.</p>
+      <div class="hero__actions">
+        <a class="btn" href="#spot">Spot him, get loot</a>
+        <a class="btn btn--ghost" href="#tour">See where he'll be</a>
+      </div>
+    </section>
+
+    <!-- BACKSTORY -->
+    <section class="story" id="story">
+      <div class="section-head">
+        <p class="tag">Backstory</p>
+        <h2>How a finger puppet got a mail route</h2>
+      </div>
+
+      <ol class="chapters">
+        <li>
+          <span class="chapters__no">01</span>
+          <h3>A puppet walks into a rave</h3>
+          <p>Marty is a zebra finger puppet. He started coming along to raves on one finger, held up above the crowd.</p>
+          <p class="todo">Add: his first rave, and when it was.</p>
+        </li>
+        <li>
+          <span class="chapters__no">02</span>
+          <h3>People kept coming over</h3>
+          <p>Strangers pointed, laughed and came over to say hi. He turned out to be the easiest way to meet people on a dancefloor.</p>
+          <p class="todo">Add: a favourite Marty moment.</p>
+        </li>
+        <li>
+          <span class="chapters__no">03</span>
+          <h3>Then he got a job</h3>
+          <p>Marty now carries the mail for The Zebra Express. He still goes out. If you see stripes above the crowd, that's him.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- SPOT MARTY -->
+    <section class="spot" id="spot">
+      <div class="spot__head">
+        <p class="tag">Bounty</p>
+        <h2>Spot him. Get loot.</h2>
+        <p>Marty carries a small bag. Find him at a rave, come up and say hi, and something from it is yours. What's in the bag? Not telling. That's the point.</p>
+      </div>
+
+      <ol class="spot__steps">
+        <li>
+          <span>1</span>
+          <h3>Check his dates</h3>
+          <p>He posts where he's heading next, right below.</p>
+        </li>
+        <li>
+          <span>2</span>
+          <h3>Look up</h3>
+          <p>He's small. He'll be on a finger, above the crowd, probably near the front.</p>
+        </li>
+        <li>
+          <span>3</span>
+          <h3>Say hi</h3>
+          <p>Come up and say hello. He'll reach into the bag. No hints.</p>
+        </li>
+      </ol>
+
+      <p class="spot__fine">One surprise per person, per night, while the bag lasts.</p>
+    </section>
+
+    <!-- TOUR -->
+    <section class="inside tour" id="tour">
+      <div class="section-head">
+        <p class="tag">Sightings · upcoming</p>
+        <h2>Where he'll be next</h2>
+      </div>
+      <ol class="sets" id="upcoming"></ol>
+      <p class="tour__empty" id="upcoming-empty" hidden>No dates announced yet. Get on the route and you'll hear first.</p>
+
+      <div class="section-head tour__been">
+        <p class="tag">Sightings · confirmed</p>
+        <h2>Where he's been</h2>
+      </div>
+      <ol class="sets" id="been"></ol>
+      <p class="tour__empty" id="been-empty" hidden>His logbook is being typed up.</p>
+
+      <noscript><p class="tour__empty">Marty's dates need JavaScript to load.</p></noscript>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="evidence" id="evidence">
+      <div class="section-head">
+        <p class="tag">Evidence</p>
+        <h2>Marty in the wild</h2>
+      </div>
+      <div class="gallery" id="gallery"></div>
+    </section>
+
+    <!-- CTA -->
+    <section class="join window">
+      <div class="join__card">
+        <p class="tag">He also delivers</p>
+        <h2>Get his mail</h2>
+        <p>One envelope a month, one sound per drop, carried to your door by the zebra himself.</p>
+        <p><a class="btn" href="index.html#join">Get on the route</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer__big">See you at the <span class="hl">front</span>.</p>
+    <nav aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="#story">Backstory</a>
+      <a href="#spot">Spot Marty</a>
+      <a href="#tour">Where he'll be</a>
+      <a href="shop.html">Shop</a>
+      <a href="index.html#join">Join</a>
+    </nav>
+    <p class="footer__fine">© 2026 The Zebra Express.</p>
+  </footer>
+
+  <script src="marty-data.js"></script>
+  <script src="marty.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

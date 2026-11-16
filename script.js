@@ -17,7 +17,8 @@ function say(text, isError) {
   input.setAttribute("aria-invalid", isError ? "true" : "false");
 }
 
-form.addEventListener("submit", async (event) => {
+// Pages without the signup form (e.g. marty.html) skip this part.
+if (form) form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const email = input.value.trim();
 
@@ -41,12 +42,12 @@ form.addEventListener("submit", async (event) => {
   }
 });
 
-input.addEventListener("input", () => {
+if (input) input.addEventListener("input", () => {
   if (msg.classList.contains("is-error")) say("");
 });
 
 // ---------------------------------------------------------------------------
-// Background: slow, warped zebra stripes drawn with WebGL.
+// Background: slow zebra stripes drawn with WebGL, warped (home) or spiral (Marty).
 // Falls back to the CSS gradient on #trip if WebGL isn't available.
 // ---------------------------------------------------------------------------
 (function trip() {
@@ -63,28 +64,42 @@ input.addEventListener("input", () => {
     uniform vec2 u_res;
     uniform float u_time;
     uniform vec2 u_mouse;
+    uniform float u_mode;
 
     void main() {
       vec2 p = 1.35 * (gl_FragCoord.xy - 0.5 * u_res) / min(u_res.x, u_res.y);
       float t = u_time * 0.11;
-      p += (u_mouse - 0.5) * 0.18;
+      float band;
+      float k1;
+      float k2;
 
-      // fold the plane over itself a few times
-      for (int i = 1; i < 5; i++) {
-        float f = float(i);
-        p += 0.32 / f * sin(p.yx * f * 1.9 + t * f * 0.7 + vec2(0.0, 1.7));
+      if (u_mode > 0.5) {
+        // Spiral: four striped arms winding slowly into the centre.
+        p += (u_mouse - 0.5) * 0.25;
+        float r = length(p) + 0.0001;
+        float a = atan(p.y, p.x);
+        float wobble = 0.5 * sin(4.0 * a + t * 1.5) + 0.45 * sin(r * 6.0 - t * 2.0);
+        float s = sin(13.0 * log(r) + 4.0 * a - t * 3.0 + wobble);
+        band = smoothstep(-0.1, 0.1, s) * smoothstep(0.03, 0.14, r);
+        k1 = 0.5 + 0.5 * sin(2.0 * a + r * 2.0 + t * 1.5);
+        k2 = 0.5 + 0.5 * sin(3.0 * log(r) - t);
+      } else {
+        // Warp: fold the plane over itself a few times, then stripe it.
+        p += (u_mouse - 0.5) * 0.18;
+        for (int i = 1; i < 5; i++) {
+          float f = float(i);
+          p += 0.32 / f * sin(p.yx * f * 1.9 + t * f * 0.7 + vec2(0.0, 1.7));
+        }
+        float s = sin(p.x * 13.0 + p.y * 4.0 + t * 2.0);
+        band = smoothstep(-0.1, 0.1, s);
+        k1 = 0.5 + 0.5 * sin(p.y * 3.1 + t * 1.5);
+        k2 = 0.5 + 0.5 * sin(p.x * 2.3 - t);
       }
-
-      // stripes
-      float s = sin(p.x * 13.0 + p.y * 4.0 + t * 2.0);
-      float band = smoothstep(-0.1, 0.1, s);
 
       vec3 acid = vec3(0.776, 1.0, 0.122);
       vec3 pink = vec3(1.0, 0.165, 0.576);
       vec3 uv   = vec3(0.478, 0.231, 1.0);
       vec3 cyan = vec3(0.098, 0.902, 1.0);
-      float k1 = 0.5 + 0.5 * sin(p.y * 3.1 + t * 1.5);
-      float k2 = 0.5 + 0.5 * sin(p.x * 2.3 - t);
       vec3 c = mix(mix(acid, pink, k1), mix(uv, cyan, k1), k2);
 
       gl_FragColor = vec4(mix(vec3(0.02), c, band), 1.0);
@@ -116,6 +131,8 @@ input.addEventListener("input", () => {
   const uRes = gl.getUniformLocation(prog, "u_res");
   const uTime = gl.getUniformLocation(prog, "u_time");
   const uMouse = gl.getUniformLocation(prog, "u_mouse");
+  // <canvas id="trip" data-mode="spiral"> switches the pattern.
+  gl.uniform1f(gl.getUniformLocation(prog, "u_mode"), canvas.dataset.mode === "spiral" ? 1 : 0);
 
   const mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
   window.addEventListener("pointermove", (e) => {
