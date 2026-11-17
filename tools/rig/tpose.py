@@ -159,9 +159,23 @@ print('TPOSE bounds x %.3f..%.3f  y %.3f..%.3f  z %.3f..%.3f' % (
     min(c.x for c in co), max(c.x for c in co), min(c.y for c in co), max(c.y for c in co),
     min(c.z for c in co), max(c.z for c in co)))
 
+# Give the texture a real file name (the web model's has none): Mixamo only picks up an embedded texture
+# whose name ends in .jpg or .png.
+import tempfile
+tex_dir = tempfile.mkdtemp(prefix='marty-skin-')
 for img in bpy.data.images:
-    if not img.packed_file and img.has_data:
-        img.pack()
+    if not (img.packed_file or img.has_data):
+        continue
+    data = img.packed_file.data if img.packed_file else None
+    ext = '.jpg' if (data[:3] == b'\xff\xd8\xff' if data else img.file_format == 'JPEG') else '.png'
+    path = os.path.join(tex_dir, 'marty-skin' + ext)
+    if data:
+        open(path, 'wb').write(data)
+    else:
+        img.filepath_raw = path; img.save()
+    img.name = 'marty-skin'
+    img.filepath = path
+    print('TPOSE texture', path, img.size[:])
 bpy.ops.export_scene.fbx(filepath=out, use_selection=False, object_types={'MESH'},
                          path_mode='COPY', embed_textures=True, add_leaf_bones=False,
                          apply_scale_options='FBX_SCALE_ALL', mesh_smooth_type='FACE')
