@@ -680,4 +680,149 @@ retarget = cut('# --------------------------------------------------------------
 retarget = retarget.replace(cut('FEET = {}\n', 'def fk('), '')
 pictures = cut('# ---------------------------------------------------------------- pictures')
 scene.render.engine = 'BLENDER_WORKBENCH'
-exec(compile(retarget + pictures, os.path.join(HERE, 'build.py'), 'exec'))
+WK = '# ---------------------------------------------------------------- write keys'
+rt_a, rt_b = retarget.split(WK)
+exec(compile(rt_a, os.path.join(HERE, 'build.py'), 'exec'))
+
+# ================================================================ keep his hands out of his body
+# The dance was made for a human, so his pom-pom hands sometimes sink into his round tummy or his
+# big head. For each frame, test the hand pom against his body and head (each carried by its own
+# bone) and, where they would overlap, swing the arm out at the shoulder just far enough.
+NV_ = len(me.vertices)
+NRM = np.empty(NV_ * 3); me.vertices.foreach_get('normal', NRM); NRM = NRM.reshape(-1, 3)
+CLEAR = float(os.environ.get('HAND_CLEAR', 0.004))          # breathing room, metres
+
+
+def surface_tree(mask):
+    ids = np.where(mask)[0][::2]
+    t = kdtree.KDTree(len(ids))
+    for j_, i_ in enumerate(ids):
+        t.insert(CO[i_], j_)
+    t.balance()
+    return t, ids
+
+core_m = (part == PART['scan']) & (R == 0)
+# body and head overlap around the neck; hits right at either cut edge are ignored
+CUT = {P + 'Spine1': (None, NECK_Z + 0.035), P + 'Head': (NECK_Z - 0.035, None)}
+SURF = {P + 'Spine1': surface_tree(core_m & (CO[:, 2] < NECK_Z + 0.035)),
+        P + 'Head': surface_tree(core_m & (CO[:, 2] >= NECK_Z - 0.035))}
+
+
+def near_cut(bn, z_):
+    lo_, hi_ = CUT[bn]
+    return (lo_ is not None and z_ < lo_ + 0.015) or (hi_ is not None and z_ > hi_ - 0.015)
+
+
+def bone_m(f, n):
+    """World matrix taking a rest-pose point on bone n to frame f."""
+    return Matrix.Translation(POS[f][n]) @ (ROT[f][n] @ R0[n].inverted()).to_matrix().to_4x4() @ \
+        Matrix.Translation(-P0[n])
+
+
+def hand_points(sx):
+    cc, mj, L = POMS[('arm', sx)]
+    r_ = (JRAW['arm' + KS + 'pom'][2])
+    rr = np.sort(r_)[::-1]
+    rad_ = (rr[1] + rr[2]) / 2 * 1.02 * 0.86
+    return [cc + mj * (L * t) for t in (-0.55, 0.0, 0.55)], rad_
+
+HANDPTS = {sx: hand_points(sx) for sx in (1, -1)}
+
+
+def penetration(f, sx):
+    """Deepest overlap of this hand with body/head this frame, and the world push direction."""
+    side = 'Left' if sx > 0 else 'Right'
+    hm = bone_m(f, P + side + 'Hand')
+    pts, rad_ = HANDPTS[sx]
+    worst, push = 0.0, None
+    for bn, (tree, ids) in SURF.items():
+        bm_ = bone_m(f, bn)
+        inv = bm_.inverted()
+        for pt in pts:
+            q = inv @ (hm @ pt)
+            _, j_, _ = tree.find(q)
+            v = Vector(CO[ids[j_]]); nn = Vector(NRM[ids[j_]])
+            if near_cut(bn, v.z):
+                continue
+            d_ = (q - v).dot(nn)
+            pen = rad_ + CLEAR - d_
+            if pen > worst:
+                worst = pen
+                push = (bm_.to_3x3() @ nn).normalized()
+    return worst, push
+
+ARMCHAIN = {sx: [P + ('Left' if sx > 0 else 'Right') + b for b in ('Arm', 'ForeArm', 'Hand')] for sx in (1, -1)}
+
+
+def swing(f, sx, q):
+    names = ARMCHAIN[sx]
+    pivot = POS[f][names[0]].copy()
+    for nm in names:
+        ROT[f][nm] = q @ ROT[f][nm]
+        POS[f][nm] = pivot + q @ (POS[f][nm] - pivot)
+
+
+def fix_pass(max_iter=40):
+    fixes = {}
+    for f in range(F0, F1 + 1):
+        for sx in (1, -1):
+            total = Quaternion()
+            for _ in range(max_iter):
+                pen, push = penetration(f, sx)
+                if pen <= 1e-4:
+                    break
+                sh = POS[f][ARMCHAIN[sx][0]]
+                hand_c = bone_m(f, ARMCHAIN[sx][2]) @ HANDPTS[sx][0][1]
+                lever = hand_c - sh
+                axis_ = lever.cross(push)
+                if axis_.length < 1e-6:
+                    break
+                ang = min(math.radians(12), pen / max(lever.length, 1e-3) * 1.15)
+                q = Quaternion(axis_.normalized(), ang)
+                swing(f, sx, q)
+                total = q @ total
+            fixes[(f, sx)] = total
+    return fixes
+
+if os.environ.get('HAND_DEBUG'):
+    def pen_detail(f, sx):
+        side = 'Left' if sx > 0 else 'Right'
+        hm = bone_m(f, P + side + 'Hand'); pts, rad_ = HANDPTS[sx]; out = []
+        for bn, (tree, ids) in SURF.items():
+            inv = bone_m(f, bn).inverted()
+            for k, pt in enumerate(pts):
+                q = inv @ (hm @ pt); _, j_, dist_ = tree.find(q)
+                v = Vector(CO[ids[j_]]); nn = Vector(NRM[ids[j_]])
+                out.append((round((rad_ + CLEAR - (q - v).dot(nn)) * 1000, 1), bn[9:], k, round(dist_ * 1000, 1), tuple(round(c, 3) for c in v), tuple(round(c, 2) for c in nn)))
+        return sorted(out, reverse=True)[:2]
+    for f in (F0, 30, 50, 80, 110):
+        for sx in (1, -1):
+            print('DBG', f, sx, pen_detail(f, sx))
+before = [max(penetration(f, sx)[0] for sx in (1, -1)) for f in range(F0, F1 + 1)]
+print('HANDS before: frames overlapping', sum(b > 1e-4 for b in before), 'of', len(before),
+      ' worst', round(max(before) * 1000, 1), 'mm')
+fixes = fix_pass()
+# ease the corrections in and out over neighbouring frames so the arms never snap
+for sx in (1, -1):
+    vecs = {f: (lambda q: Vector(q.axis) * q.angle if q.angle > 1e-6 else Vector())(fixes[(f, sx)]) for f in range(F0, F1 + 1)}
+    for f in range(F0, F1 + 1):
+        acc, wsum = Vector(), 0.0
+        for g in range(f - 4, f + 5):
+            if F0 <= g <= F1:
+                wgt = math.exp(-((g - f) / 2.2) ** 2)
+                v_ = vecs[g]
+                acc += v_ * wgt; wsum += wgt
+        target = acc / wsum
+        cur = vecs[f]
+        extra = target - cur if target.length > cur.length else Vector()
+        if extra.length > 1e-6:
+            # only ever add more swing, so smoothing can't put a hand back inside him
+            swing(f, sx, Quaternion(extra.normalized(), extra.length))
+fixes2 = fix_pass()
+after = [max(penetration(f, sx)[0] for sx in (1, -1)) for f in range(F0, F1 + 1)]
+print('HANDS after: frames overlapping', sum(a > 1e-4 for a in after), ' worst', round(max(after) * 1000, 1), 'mm')
+worst_frames = sorted(range(F0, F1 + 1), key=lambda f: -before[f - F0])[:4]
+print('HANDS worst frames before', [(f, round(before[f - F0] * 1000)) for f in worst_frames])
+print('HANDS swing (deg) max', round(max(math.degrees(q.angle) for q in fixes.values()), 1))
+
+exec(compile(WK + rt_b + pictures, os.path.join(HERE, 'build.py'), 'exec'))
