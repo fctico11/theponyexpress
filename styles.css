@@ -736,9 +736,8 @@ a { color: inherit; }
   overflow: hidden;
   cursor: grab;
   touch-action: pan-y;
-  /* a lit dance floor: glow overhead, coloured tiles underfoot */
+  /* stage lights overhead; the floor glow and shadow are drawn in 3D */
   background:
-    radial-gradient(ellipse 50% 13% at 50% 81%, rgb(198 255 31 / 0.55), transparent 70%),
     radial-gradient(circle at 20% 15%, rgb(255 42 147 / 0.35), transparent 45%),
     radial-gradient(circle at 80% 15%, rgb(25 230 255 / 0.3), transparent 45%),
     radial-gradient(circle at 50% 40%, rgb(122 59 255 / 0.4), transparent 65%),
@@ -766,6 +765,14 @@ a { color: inherit; }
 .dance__speed input { width: 100%; accent-color: var(--acid); cursor: pointer; }
 .dance__ends { display: flex; justify-content: space-between; color: var(--dim); font-size: 0.7rem; }
 .dance__ends i { font-style: normal; }
+
+.tune { margin-top: 2.25rem; padding-top: 1.5rem; border-top: 1px solid var(--line); max-width: 26rem; }
+.tune > * + * { margin-top: 0.9rem; }
+.tune__title strong { display: block; font-family: var(--display); font-weight: 900; text-transform: uppercase; font-size: 1.15rem; color: var(--white); }
+.tune__title span { color: var(--dim); font-size: 0.95em; }
+.tune__fine { color: var(--dim); font-size: 0.85rem; }
+.tune__player[hidden], .tune .btn[hidden] { display: none; }
+.tune__player iframe { display: block; width: 100%; border: 0; border-radius: 12px; }
 
 @media (max-width: 860px) {
   .dance { grid-template-columns: 1fr; }

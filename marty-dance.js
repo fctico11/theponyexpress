@@ -1,7 +1,7 @@
-// 3D Marty, dancing. Loads media/marty/marty-shuffle.fbx with three.js
+// 3D Marty, dancing. Loads media/marty/marty-shuffle.glb with three.js
 // (fetched from a CDN) the first time the stage scrolls into view.
 import * as THREE from "three";
-import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const stage = document.getElementById("dance-stage");
 const toggle = document.getElementById("dance-toggle");
@@ -70,27 +70,64 @@ if (stage) {
       return;
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
     stage.append(renderer.domElement);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
-    camera.position.set(0, 1.15, 5.9);
-    camera.lookAt(0, 1.0, 0);
+    // Looking slightly down, so the floor (and his shadow on it) is visible.
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+    camera.position.set(0, 1.45, 6.2);
+    camera.lookAt(0, 1.2, 0);
 
-    // House lights: soft white from the front, pink and cyan from the wings.
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x332244, 2.4));
-    const key = new THREE.DirectionalLight(0xffffff, 1.8);
+    // Soft white from the front, a warm fill, and pink and cyan rims from behind.
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x2a1a44, 1.5));
+    const key = new THREE.DirectionalLight(0xffffff, 2.6);
     key.position.set(1.5, 4, 5);
     scene.add(key);
-    const pink = new THREE.PointLight(0xff2a93, 30, 12);
-    pink.position.set(-3, 2, -1.5);
-    scene.add(pink);
-    const cyan = new THREE.PointLight(0x19e6ff, 30, 12);
-    cyan.position.set(3, 2, -1.5);
-    scene.add(cyan);
+    const fill = new THREE.DirectionalLight(0xffe9d6, 0.9);
+    fill.position.set(-3, 1.5, 4);
+    scene.add(fill);
+    const pink = new THREE.SpotLight(0xff2a93, 90, 14, 0.9, 0.6);
+    pink.position.set(-3.2, 3, -2.6);
+    scene.add(pink, pink.target);
+    const cyan = new THREE.SpotLight(0x19e6ff, 90, 14, 0.9, 0.6);
+    cyan.position.set(3.2, 3, -2.6);
+    scene.add(cyan, cyan.target);
+    pink.target.position.set(0, 1, 0);
+    cyan.target.position.set(0, 1, 0);
 
     const spinner = new THREE.Group(); // drag turns this
     scene.add(spinner);
+
+    // The floor: a pool of light, with a soft shadow that follows him around.
+    function spot(stops) {
+      const c = document.createElement("canvas");
+      c.width = c.height = 256;
+      const g = c.getContext("2d");
+      const fade = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+      stops.forEach(([at, colour]) => fade.addColorStop(at, colour));
+      g.fillStyle = fade;
+      g.fillRect(0, 0, 256, 256);
+      const texture = new THREE.CanvasTexture(c);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      return texture;
+    }
+    function decal(size, texture, height) {
+      const mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(size, size),
+        new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, toneMapped: false })
+      );
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.position.y = height;
+      mesh.renderOrder = -1;
+      return mesh;
+    }
+    scene.add(decal(4.2, spot([[0, "rgba(198,255,31,0.5)"], [0.45, "rgba(198,255,31,0.2)"], [1, "rgba(198,255,31,0)"]]), 0));
+    const shadow = decal(2.0, spot([[0, "rgba(0,0,0,0.8)"], [0.5, "rgba(0,0,0,0.4)"], [1, "rgba(0,0,0,0)"]]), 0.01);
+    scene.add(shadow);
+    let hips = null;
+    const hipsAt = new THREE.Vector3();
 
     function resize() {
       const w = stage.clientWidth;
@@ -99,7 +136,7 @@ if (stage) {
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     }
-    new ResizeObserver(() => { resize(); if (!running) renderer.render(scene, camera); }).observe(stage);
+    new ResizeObserver(() => { resize(); if (!running) paint(); }).observe(stage);
     resize();
 
     let mixer = null;
@@ -112,8 +149,16 @@ if (stage) {
       if (!running) return;
       const dt = Math.min(clock.getDelta(), 0.1);
       if (mixer) mixer.update(dt);
-      renderer.render(scene, camera);
+      paint();
       requestAnimationFrame(frame);
+    }
+    function paint() {
+      if (hips) {
+        hips.getWorldPosition(hipsAt);
+        shadow.position.x = hipsAt.x;
+        shadow.position.z = hipsAt.z;
+      }
+      renderer.render(scene, camera);
     }
     function sync() {
       const should = Boolean(mixer) && playing && onScreen && !document.hidden;
@@ -143,7 +188,7 @@ if (stage) {
       if (dragX === null) return;
       spinner.rotation.y += (e.clientX - dragX) * 0.012;
       dragX = e.clientX;
-      if (!running) renderer.render(scene, camera);
+      if (!running) paint();
     });
     const drop = () => { dragX = null; };
     stage.addEventListener("pointerup", drop);
@@ -151,40 +196,67 @@ if (stage) {
     stage.addEventListener("keydown", (e) => {
       if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
       spinner.rotation.y += e.key === "ArrowLeft" ? -0.3 : 0.3;
-      if (!running) renderer.render(scene, camera);
+      if (!running) paint();
     });
 
-    new FBXLoader().load("media/marty/marty-shuffle.fbx", (model) => {
-      // The file ships its own camera and light; ours replace them.
-      model.children.filter((c) => c.isCamera || c.isLight).forEach((c) => model.remove(c));
-      model.traverse((o) => { if (o.isSkinnedMesh) o.frustumCulled = false; });
+    // The model is Marty's scan re-rigged in Blender: a skeleton fitted to his
+    // rope limbs and pom-pom hands and feet, with the shuffle retargeted onto it.
+    new GLTFLoader().load("media/marty/marty-shuffle.glb", (gltf) => {
+      const model = gltf.scene;
+      model.traverse((o) => {
+        if (!o.isSkinnedMesh) return;
+        o.frustumCulled = false;
+        const map = o.material.map || null;
+        if (map) map.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        // Matte and plush, whatever the file's material says.
+        o.material = new THREE.MeshStandardMaterial({ map, roughness: 1, metalness: 0 });
+      });
+      hips = model.getObjectByName("mixamorigHips") || null;
 
-      const clip = model.animations[0] && loopClip(model.animations[0]);
+      const clip = gltf.animations[0] && loopClip(gltf.animations[0]);
       if (clip) {
         mixer = new THREE.AnimationMixer(model);
-        mixer.timeScale = Number(speed.value) || 1;
         mixer.clipAction(clip).play();
-        mixer.update(still.matches ? 0.6 : 0);
       }
 
-      // Measure him from his skeleton once he's in the dance pose (the rest pose
-      // sits somewhere else entirely), then scale to 2 units tall, feet on the floor.
-      model.updateMatrixWorld(true);
+      const stand = new THREE.Group();
+      stand.add(model);
+
+      // Measure the actual skin (not the skeleton) across the whole dance, so he
+      // is sized and centred for every pose and his feet really touch the floor.
       const box = new THREE.Box3();
       const at = new THREE.Vector3();
-      model.traverse((o) => { if (o.isBone) box.expandByPoint(o.getWorldPosition(at)); });
+      const skins = [];
+      model.traverse((o) => { if (o.isSkinnedMesh) skins.push(o); });
+      const samples = clip ? 16 : 1;
+      for (let i = 0; i < samples; i++) {
+        if (mixer) mixer.setTime((clip.duration * i) / samples);
+        stand.updateMatrixWorld(true);
+        for (const skin of skins) {
+          skin.skeleton.update();
+          const count = skin.geometry.attributes.position.count;
+          for (let v = 0; v < count; v += 5) {
+            skin.getVertexPosition(v, at).applyMatrix4(skin.matrixWorld);
+            box.expandByPoint(at);
+          }
+        }
+      }
+      if (mixer) {
+        mixer.setTime(still.matches ? 0.6 : 0);
+        mixer.timeScale = Number(speed.value) || 1;
+      }
       const size = box.getSize(new THREE.Vector3());
-      const scale = 2 / (size.y || 1);
+      const scale = 2.5 / (size.y || 1);
       const centre = box.getCenter(new THREE.Vector3());
-      model.scale.setScalar(scale);
-      model.position.set(-centre.x * scale, -box.min.y * scale, -centre.z * scale);
-      spinner.add(model);
+      stand.scale.setScalar(scale);
+      stand.position.set(-centre.x * scale, -box.min.y * scale, -centre.z * scale);
+      spinner.add(stand);
 
       stage.classList.add("is-ready");
       status.textContent = "";
       controls.hidden = false;
       setSpeed();
-      renderer.render(scene, camera);
+      paint();
       sync();
     }, undefined, () => {
       status.textContent = "Marty's dance didn't load. Refresh to try again.";

@@ -108,3 +108,43 @@
     gallery.append(fig);
   });
 })();
+
+// The tune: Spotify's player is only loaded once someone asks for it, so the
+// page doesn't talk to Spotify until then.
+(function tune() {
+  const button = document.getElementById("tune-load");
+  const holder = document.getElementById("tune-player");
+  const fine = document.getElementById("tune-fine");
+  if (!button || !holder) return;
+  const track = button.dataset.track;
+
+  function plainPlayer() {
+    const frame = document.createElement("iframe");
+    frame.src = `https://open.spotify.com/embed/track/${track}?theme=0`;
+    frame.title = "Free Your Mind by Prospa, Cloonee and Sybil, on Spotify";
+    frame.height = "152";
+    frame.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+    holder.replaceChildren(frame);
+  }
+
+  button.addEventListener("click", () => {
+    button.hidden = true;
+    holder.hidden = false;
+    fine.textContent = "If it doesn't start, press play on the player. Spotify plays a preview unless you're signed in.";
+
+    // Spotify's embed script lets us start playback straight away; if it
+    // can't load, fall back to their ordinary player.
+    const slot = document.createElement("div");
+    holder.append(slot);
+    window.onSpotifyIframeApiReady = (api) => {
+      api.createController(slot, { uri: `spotify:track:${track}`, height: 152, theme: "dark" }, (player) => {
+        player.addListener("ready", () => player.play());
+      });
+    };
+    const script = document.createElement("script");
+    script.src = "https://open.spotify.com/embed/iframe-api/v1";
+    script.async = true;
+    script.onerror = plainPlayer;
+    document.head.append(script);
+  }, { once: true });
+})();
