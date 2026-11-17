@@ -309,6 +309,40 @@ for _ in range(3):
     on_egg = CEN + (CO - CEN) / np.maximum(k0, 1e-6)[:, None]
     w = bot * sstep(1.0, 0.94, k0)
 tb = Vector((0, JRAW['tail'][0].y, JRAW['tail'][0].z))      # where the old tail joined (repainted later)
+
+# ================================================================ straight rope arms and legs
+# The scan's ropes are kinked and lumpy (the puppet's floppy limbs, as they happened to lie), which
+# makes them look bent before he moves and wobbly when he does. Lay each one out straight from where
+# it's sewn on, keeping its woven surface: every vertex keeps its offset from the rope's centre line,
+# carried along as the centre line is pulled straight, and the rope's width is evened out along it.
+STRAIGHT = not os.environ.get('NO_STRAIGHT')
+ATTACH = {k: JRAW[k + KS][0].copy() for k in ('arm', 'leg')}
+from limbs import straighten
+
+if os.environ.get('STRAIGHT_DUMP'):
+    Ed = np.empty(len(me.edges) * 2, dtype=np.int64); me.edges.foreach_get('vertices', Ed)
+    np.savez(os.environ['STRAIGHT_DUMP'], CO=CO, R=R, E=Ed.reshape(-1, 2),
+             J=np.array([[list(p) for p in JRAW[k + KS][:3]] for k in ('arm', 'leg')]), KEEP=KEEP)
+    sys.exit(0)
+if STRAIGHT:
+    J_SCAN = {k: list(JRAW[k + KS]) for k in ('arm', 'leg')}     # both sides start from the scan's joints
+    for kind, rid in (('arm', 1), ('leg', 2)):
+        for sx in (1, -1):
+            ids = np.where((R == rid) & (np.sign(CO[:, 0]) == sx))[0]
+            f_ = lambda v: np.array([abs(v.x) * sx, v.y, v.z])
+            a_, e_, wr_, _ = (f_(p) for p in J_SCAN[kind])
+            CO[ids], info = straighten(CO[ids], a_, e_, wr_, attach=0.035 if kind == 'arm' else 0.03)
+            print('STRAIGHT', kind, sx, len(ids), 'verts; width', round(info['rt'] * 2000, 1), 'mm; length',
+                  round(info['L'] * 1000, 1), 'mm; dir', info['D'].round(3))
+            if sx == KEEP:
+                Dv, a0, wr_new = Vector(info['D']), Vector(info['a0']), Vector(info['end_new'])
+                c, axes, r = JRAW[kind + KS + 'pom']
+                gap = (c - JRAW[kind + KS][2]).length
+                a, e_old, wr_old = J_SCAN[kind][:3]
+                e_s = (e_old - a).length / ((e_old - a).length + (wr_old - e_old).length)
+                JRAW[kind + KS] = [a0, a0.lerp(wr_new, e_s), wr_new, wr_new + Dv * gap * 2]
+                JRAW[kind + KS + 'pom'] = (wr_new + Dv * gap, [Dv] + list(axes[1:]), r)
+    me.vertices.foreach_set('co', CO.ravel()); me.update()
 me.attributes.new('part', 'FLOAT', 'POINT').data.foreach_set('value', [0.0] * n)
 
 # ================================================================ new hands, feet and tail
@@ -316,6 +350,7 @@ PART = dict(scan=0, rope=1, pom=2, tuft=5, hair=6)
 mirror = lambda v: Vector((-v.x, v.y, v.z))
 bm = bmesh.new()
 POMS = {}
+POM_MINOR = {}
 for kind in ('arm', 'leg'):
     c, axes, r = JRAW[kind + KS + 'pom']
     major = axes[0]
@@ -327,6 +362,8 @@ for kind in ('arm', 'leg'):
     size = 0.86 if kind == 'arm' else 1.0       # his hands read a touch big once smoothed
     minor *= size
     length = rr[0] * size
+    if STRAIGHT and kind == 'arm':                  # sit the hand just over the rope's cut end
+        c = wrist + major * min((c - wrist).length, length - float(os.environ.get('HAND_OVER', 0.012)))
     c = Vector((abs(c.x) * KEEP, c.y, c.z))
     for sx in (1, -1):
         cc = Vector((c.x * sx, c.y, c.z))
@@ -334,7 +371,81 @@ for kind in ('arm', 'leg'):
         rot = Vector((0, 0, 1)).rotation_difference(mj)
         ellipsoid(bm, cc, (minor, minor, length), rot, segs=(40, 26))
         POMS[(kind, sx)] = (cc, mj, length)
+    POM_MINOR[kind] = minor
 poms = obj_from(bm, 'poms', {'part': PART['pom']})
+
+# A soft cuff where each rope arm meets its hand. The scan's rope ends in a ragged cut, so cut the last bit
+# off cleanly and build a smooth new end in its place: it widens as it reaches the hand and runs into it,
+# meeting the hand's surface where the two are the same width (painted the rope's colour later).
+FLARE = float(os.environ.get('FLARE', 0.6))
+CUFF_CUT = float(os.environ.get('CUFF_CUT', 0.016))       # how far before the hand's tip the scan rope stops
+if STRAIGHT and FLARE > 0:
+    bm = bmesh.new(); bm.from_mesh(me)
+    lay_r = bm.verts.layers.float['region']; lay_p = bm.verts.layers.float['part']
+    uvl = bm.loops.layers.uv.active
+    for sx in (1, -1):
+        cc, mj, Lp = POMS[('arm', sx)]
+        c_, m_ = Vector(cc), Vector(mj)
+        mr = POM_MINOR['arm']
+        U = lambda p: -Lp - (p - c_).dot(m_)
+        radial = lambda p: (p - c_) - m_ * (p - c_).dot(m_)
+        mine = lambda v: round(v[lay_r]) == 1 and (v.co.x > 0) == (sx > 0)
+        arm_v = [v for v in bm.verts if mine(v)]
+        rt_ = float(np.median([radial(v.co).length for v in arm_v if 0.02 < U(v.co) < 0.05]))
+        peak = min(rt_ * (1 + FLARE), 0.6 * mr)
+        u_p = Lp * (math.sqrt(1 - (peak / mr) ** 2) - 1)   # where the hand is exactly as wide as the cuff
+        bmesh.ops.delete(bm, geom=[v for v in arm_v if U(v.co) < CUFF_CUT], context='VERTS')
+        # drop any scraps that came loose, then take the open rim
+        rim = [v for v in bm.verts if mine(v) and any(e.is_boundary for e in v.link_edges)]
+        loose = [v for v in bm.verts if mine(v) and not v.link_faces]
+        bmesh.ops.delete(bm, geom=loose, context='VERTS')
+        rim = [v for v in rim if v.is_valid and v.link_faces and U(v.co) < CUFF_CUT + 0.01]
+        # a reference frame round the hand's axis, to order the rim
+        e1 = radial(rim[0].co).normalized(); e2 = m_.cross(e1)
+        ang = lambda p: math.atan2(radial(p).dot(e2), radial(p).dot(e1))
+        rim.sort(key=lambda v: ang(v.co))
+        uv_of = {v: next((l[uvl].uv.copy() for l in v.link_loops), Vector((0, 0))) for v in rim}
+        for v in rim:                                          # a clean round rim
+            d = radial(v.co).normalized()
+            v.co = c_ + m_ * (-Lp - CUFF_CUT) + d * rt_
+        # rings from the rim into the hand
+        K = 10
+        u_end = -0.010
+        prev = rim
+        for k in range(1, K + 1):
+            t = k / K
+            u = CUFF_CUT + (u_end - CUFF_CUT) * t
+            if u > u_p:
+                v_ = (u - u_p) / (CUFF_CUT - u_p)
+                r = rt_ + (peak - rt_) * (1 - v_) ** 2
+            else:
+                q_ = (-Lp - u) / Lp
+                r = min(peak, 0.97 * mr * math.sqrt(max(0.0, 1 - q_ * q_)))
+            ring = []
+            for v in rim:
+                d = radial(v.co).normalized()
+                nv = bm.verts.new(c_ + m_ * (-Lp - u) + d * r)
+                nv[lay_r] = 1.0; nv[lay_p] = 0.0
+                ring.append(nv)
+            for a in range(len(rim)):
+                b = (a + 1) % len(rim)
+                f = bm.faces.new((prev[a], prev[b], ring[b], ring[a]))
+                for l in f.loops:
+                    src = rim[(prev.index(l.vert) if l.vert in prev else ring.index(l.vert))]
+                    l[uvl].uv = uv_of[src]
+            prev = ring
+        cv = bm.verts.new(c_ + m_ * (-Lp - u_end)); cv[lay_r] = 1.0; cv[lay_p] = 0.0
+        for a in range(len(rim)):
+            f = bm.faces.new((prev[a], prev[(a + 1) % len(rim)], cv))
+            for l in f.loops:
+                l[uvl].uv = uv_of[rim[a]]
+        print('CUFF', sx, 'rope r', round(rt_ * 1000, 1), 'mm -> cuff r', round(peak * 1000, 1), 'mm; rim', len(rim),
+              'verts; hand r', round(mr * 1000, 1))
+    bm.normal_update()
+    bm.to_mesh(me); bm.free(); me.update()
+    n = len(me.vertices)
+    R = np.empty(n); me.attributes['region'].data.foreach_get('value', R); R = np.rint(R).astype(int)
+    CO = np.empty(n * 3); me.vertices.foreach_get('co', CO); CO = CO.reshape(-1, 3)
 
 # ---- tail: a thicker rope with a full tassel on the end
 base, tip = JRAW['tail']
@@ -539,6 +650,7 @@ def position():
 C = bake(old_tex)
 G = bake(lambda: attr('gain')) * 2
 PT = np.rint(bake(lambda: attr('part'))[:, :, 0])
+RG = np.rint(bake(lambda: attr('region'))[:, :, 0])      # 1: arm rope, 2: leg rope
 POS = bake(position) - 0.5
 
 
@@ -624,6 +736,43 @@ head = sstep(NECK_Z - 0.02, NECK_Z + 0.02, POS[..., 2])
 down = sstep(-0.15, -0.75, nz)
 dim = BRIGHT * (1 + (HEAD_K - 1) * head * (1 - down)) * (1 + (UNDER_K - 1) * down)
 col = np.where(body[..., None], col * dim[..., None], col)
+# The cuff where each rope arm runs into its hand is new geometry with no scan texture of its own: give it
+# the rope's own weave, copied from the rope just above it at the same angle round the arm (mirrored back
+# and forth along the arm, so there's no seam), fading in from the scanned rope.
+if STRAIGHT and FLARE > 0:
+    armrope = (RG == 1) & body
+    for sx in (1, -1):
+        cc, mj, Lp = POMS[('arm', sx)]
+        c3, m3 = np.array(cc), np.array(mj)
+        rel = POS - c3
+        ax = rel @ m3
+        radv = rel - ax[..., None] * m3
+        rad = np.linalg.norm(radv, axis=-1)
+        u = -Lp - ax
+        mine = armrope & (rad < 0.035) & (u < 0.08)
+        # brown scraps of the old cut end: plain rope colour
+        brown = sstep(1.15, 1.4, col[..., 0] / np.maximum(col[..., 2], 1e-5)) * mine * (u < 0.045)
+        col = col + (fur - col) * brown[..., None]
+        e1 = np.cross(m3, [0, 0, 1.0]); e1 /= np.linalg.norm(e1); e2 = np.cross(m3, e1)
+        ang = np.arctan2(radv @ e2, radv @ e1)
+        U0, P_ = float(os.environ.get('CUFF_B', 0.026)) + 0.001, 0.024
+        src = mine & (u > U0) & (u < U0 + P_)
+        R0_ = 0.0103
+        si = np.argwhere(src)
+        tree_ = kdtree.KDTree(len(si))
+        for k_i, (yy, xx) in enumerate(si):
+            tree_.insert((math.cos(ang[yy, xx]) * R0_, math.sin(ang[yy, xx]) * R0_, u[yy, xx]), k_i)
+        tree_.balance()
+        k_ = (1 - sstep(float(os.environ.get('CUFF_A', 0.016)), float(os.environ.get('CUFF_B', 0.026)), u)) * mine
+        new_col = col.copy()
+        for yy, xx in np.argwhere(k_ > 0.002):
+            d_ = (U0 - u[yy, xx]) % (2 * P_)
+            us = U0 + (d_ if d_ < P_ else 2 * P_ - d_)
+            _, j_, _ = tree_.find((math.cos(ang[yy, xx]) * R0_, math.sin(ang[yy, xx]) * R0_, us))
+            sy, sx_ = si[j_]
+            new_col[yy, xx] = col[sy, sx_]
+        col = col + (new_col - col) * k_[..., None]
+        print('CUFF weave', sx, 'from', len(si), 'rope px to', int((k_ > 0.002).sum()), 'cuff px')
 for pid, base_col, amp in ((PART['pom'], POM_COL, 0.10), (PART['tuft'], TUFT_COL, 0.12), (PART['hair'], TUFT_COL * 1.3, 0.14), (PART['rope'], ROPE_COL, 0.0)):
     c_ = base_col * (1 + amp * fz)[..., None]
     if pid == PART['rope']:
@@ -722,6 +871,7 @@ def chain_g(p, pts):
 
 SPINE = [(0.0, 'Hips'), (0.3, 'Spine'), (0.5, 'Spine1'), (0.75, 'Spine2'), (1.0, 'Neck'), (1.12, 'Head')]
 TOP = {'arm': 'Arm', 'leg': 'UpLeg'}
+ELBOW_W = float(os.environ.get('ELBOW_W', 0.1))
 W = []
 for i in range(NV):
     p = Vector(CO[i])
@@ -738,7 +888,8 @@ for i in range(NV):
         kind = 'arm' if R[i] == 1 else 'leg'
         names = [P + sd + b for b in (('Arm', 'ForeArm', 'Hand') if kind == 'arm' else ('UpLeg', 'Leg', 'Foot'))]
         g = chain_g(p, CHAIN[(kind, sx)])
-        f1 = smooth(0.75, 1.25, g); f2 = smooth(1.8, 2.0, g)
+        ew = ELBOW_W if kind == 'arm' else 0.25         # arms: a short bend zone, so a clear elbow
+        f1 = smooth(1 - ew, 1 + ew, g); f2 = smooth(1.8, 2.0, g)
         w[names[0]] = 1 - f1; w[names[1]] = f1 - f2; w[names[2]] = f2
     else:
         s = S(p)
@@ -754,7 +905,7 @@ for i in range(NV):
                     w[P + b1] = w.get(P + b1, 0) + t
                     break
         for kind in ('arm', 'leg'):                      # soften where the ropes are sewn on
-            dA = (p - CHAIN[(kind, sx)][0]).length
+            dA = (p - Vector((abs(ATTACH[kind].x) * sx, ATTACH[kind].y, ATTACH[kind].z))).length
             lw = 1 - smooth(0.004, 0.022, dA)
             if lw > 0:
                 for b in w:
@@ -916,31 +1067,59 @@ if os.environ.get('HAND_DEBUG'):
     for f in (F0, 30, 50, 80, 110):
         for sx in (1, -1):
             print('DBG', f, sx, pen_detail(f, sx))
+def arm_dump():
+    return {f: {n: tuple(ROT[f][n]) for n in ORDER if any(k in n for k in ('Shoulder', 'Arm', 'Hand', 'Spine2'))} for f in range(F0, F1 + 1)}
+ARM_DUMP = {'pre': arm_dump()} if os.environ.get('ARM_DUMP') else None
 before = [max(penetration(f, sx)[0] for sx in (1, -1)) for f in range(F0, F1 + 1)]
 print('HANDS before: frames overlapping', sum(b > 1e-4 for b in before), 'of', len(before),
       ' worst', round(max(before) * 1000, 1), 'mm')
-fixes = fix_pass()
-# ease the corrections in and out over neighbouring frames so the arms never snap
-for sx in (1, -1):
-    vecs = {f: (lambda q: Vector(q.axis) * q.angle if q.angle > 1e-6 else Vector())(fixes[(f, sx)]) for f in range(F0, F1 + 1)}
-    for f in range(F0, F1 + 1):
-        acc, wsum = Vector(), 0.0
-        for g in range(f - 4, f + 5):
-            if F0 <= g <= F1:
-                wgt = math.exp(-((g - f) / 2.2) ** 2)
-                v_ = vecs[g]
-                acc += v_ * wgt; wsum += wgt
-        target = acc / wsum
-        cur = vecs[f]
-        extra = target - cur if target.length > cur.length else Vector()
-        if extra.length > 1e-6:
-            # only ever add more swing, so smoothing can't put a hand back inside him
-            swing(f, sx, Quaternion(extra.normalized(), extra.length))
-fixes2 = fix_pass()
+# Smoothing the arms works on each joint's rotation relative to its parent, then re-places the forearm and hand.
+def chain_fk(f, sx):
+    for n in ARMCHAIN[sx][1:]:
+        p_ = PARENT[n]
+        POS[f][n] = POS[f][p_] + (ROT[f][p_] @ R0[p_].inverted()) @ (P0[n] - P0[p_])
+
+
+def smooth_arms(passes=2):
+    for sx in (1, -1):
+        for n in ARMCHAIN[sx]:
+            p_ = PARENT[n]
+            for _ in range(passes):
+                L = {f: ROT[f][p_].inverted() @ ROT[f][n] for f in range(F0, F1 + 1)}
+                for f in range(F0 + 1, F1):
+                    a_, b_, c_ = L[f - 1], L[f], L[f + 1]
+                    if a_.dot(b_) < 0: a_ = -a_
+                    if c_.dot(b_) < 0: c_ = -c_
+                    ROT[f][n] = ROT[f][p_] @ Quaternion(Vector(a_) * 0.25 + Vector(b_) * 0.5 + Vector(c_) * 0.25).normalized()
+        for f in range(F0, F1 + 1):
+            chain_fk(f, sx)
+
+
+FR = list(range(F0, F1 + 1))
+# Push the hands clear, then smooth the arms' motion over time, and repeat: the arm settles into one
+# smooth path that stays clear of his tummy and head (pushing frame by frame alone made the arms jerk).
+if os.environ.get('OLD_HANDS'):
+    fixes = fix_pass()
+    lift_max = 0.0
+else:
+    smooth_arms()
+    lift_max = 0.0
+    for rnd in range(int(os.environ.get('FIX_ROUNDS', 5))):
+        fx = fix_pass()
+        lift_max = max(lift_max, max(q.angle for q in fx.values()))
+        smooth_arms(passes=int(os.environ.get('ARM_SMOOTH', 4)))
+        left_ = [max(penetration(f, sx)[0] for sx in (1, -1)) for f in FR]
+        print('HANDS round', rnd, 'overlapping', sum(v > 1e-4 for v in left_), 'worst', round(max(left_) * 1000, 1), 'mm')
+    fix_pass()                                   # last little nudges, no smoothing after
+fixes = {(f, sx): Quaternion() for f in FR for sx in (1, -1)}
+print('HANDS push (deg) max', round(math.degrees(lift_max), 1))
 after = [max(penetration(f, sx)[0] for sx in (1, -1)) for f in range(F0, F1 + 1)]
 print('HANDS after: frames overlapping', sum(a > 1e-4 for a in after), ' worst', round(max(after) * 1000, 1), 'mm')
 worst_frames = sorted(range(F0, F1 + 1), key=lambda f: -before[f - F0])[:4]
 print('HANDS worst frames before', [(f, round(before[f - F0] * 1000)) for f in worst_frames])
-print('HANDS swing (deg) max', round(max(math.degrees(q.angle) for q in fixes.values()), 1))
+if ARM_DUMP is not None:
+    import pickle
+    ARM_DUMP['post'] = arm_dump(); ARM_DUMP['fixes'] = {k: tuple(v) for k, v in fixes.items()}
+    pickle.dump(ARM_DUMP, open(os.environ['ARM_DUMP'], 'wb'))
 
 exec(compile(WK + rt_b + pictures, os.path.join(HERE, 'build.py'), 'exec'))
