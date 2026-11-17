@@ -541,6 +541,16 @@ G = bake(lambda: attr('gain')) * 2
 PT = np.rint(bake(lambda: attr('part'))[:, :, 0])
 POS = bake(position) - 0.5
 
+
+def normal():
+    g = nt.nodes.new('ShaderNodeNewGeometry')
+    m = nt.nodes.new('ShaderNodeVectorMath'); m.operation = 'MULTIPLY_ADD'
+    nt.links.new(g.outputs['Normal'], m.inputs[0])
+    m.inputs[1].default_value = (0.5, 0.5, 0.5); m.inputs[2].default_value = (0.5, 0.5, 0.5)
+    return m.outputs['Vector']
+
+NRM = bake(normal) * 2 - 1
+
 Am = C * G
 tint = target / (target @ LUM)
 Lg = Am + (tint * (Am @ LUM)[..., None] - Am) * 0.6
@@ -602,6 +612,18 @@ lift = 1 - stripe_like
 dark = np.maximum(level * (1 - sstep(0.15, 0.3, relc)), 0.75 * stripe_like)
 col = col + (fur - col) * (tidy * lift)[..., None]
 col = col + (STRIPE_COL * (1 + 0.08 * fz)[..., None] - col) * (tidy * dark)[..., None]
+# Tone him down: the fur reads blown-out white on the site's stage lights, his face most of all (the
+# scan's head fur is about 20% brighter than his body's). Dim all of him, his face more, but only where it
+# faces up or out towards the lights: what faces down (under his chin, under his tummy) only gets the
+# stage's dim purple ground light, so lift that instead.
+BRIGHT = float(os.environ.get('BRIGHT', 0.62))
+HEAD_K = float(os.environ.get('HEAD_K', 0.72))
+UNDER_K = float(os.environ.get('UNDER_K', 1.45))
+nz = NRM[..., 2]
+head = sstep(NECK_Z - 0.02, NECK_Z + 0.02, POS[..., 2])
+down = sstep(-0.15, -0.75, nz)
+dim = BRIGHT * (1 + (HEAD_K - 1) * head * (1 - down)) * (1 + (UNDER_K - 1) * down)
+col = np.where(body[..., None], col * dim[..., None], col)
 for pid, base_col, amp in ((PART['pom'], POM_COL, 0.10), (PART['tuft'], TUFT_COL, 0.12), (PART['hair'], TUFT_COL * 1.3, 0.14), (PART['rope'], ROPE_COL, 0.0)):
     c_ = base_col * (1 + amp * fz)[..., None]
     if pid == PART['rope']:
