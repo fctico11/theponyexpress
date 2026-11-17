@@ -225,7 +225,17 @@ for v in bm.verts:
 biggest = max(len(i) for i in islands)
 bmesh.ops.delete(bm, geom=[v for i in islands if len(i) < biggest for v in i], context='VERTS')
 print('ISLANDS dropped', [len(i) for i in islands if len(i) < biggest])
-bmesh.ops.holes_fill(bm, edges=bm.edges[:], sides=400)
+_hf = bmesh.ops.holes_fill(bm, edges=bm.edges[:], sides=400)
+# the hole under his bottom, where the old tail scraps were cut away: fan it so it can bulge out round
+BOT_C = None
+for f in _hf['faces']:
+    c = f.calc_center_median()
+    if 0.75 < c.z < 0.83 and abs(c.x) < 0.05:
+        BOT_C = np.array([0.0, c.y, c.z])
+        pk = bmesh.ops.poke(bm, faces=[f])
+        bmesh.ops.subdivide_edges(bm, edges=list({e for g in pk['faces'] for e in g.edges}), cuts=2,
+                                  use_grid_fill=True)
+print('BOTTOM hole centre', BOT_C)
 bm.to_mesh(me); bm.free()
 select_only(mesh)
 bpy.ops.object.mode_set(mode='EDIT')
@@ -268,6 +278,37 @@ BACKMASK = (R == 0) * sstep(0.83, 0.87, z) * (1 - sstep(0.985, 1.02, z)) * sstep
 print('BACK smooth verts', int((BACKMASK > 0.5).sum()))
 taubin(me, int(os.environ.get('BACKSMOOTH', 30)), lam=0.5, mu=0.0, weight=BACKMASK)
 taubin(me, 10, weight=BACKMASK)
+
+# close his bottom: the real puppet is open underneath (that's where the finger goes in), so the scan
+# has a dent there. Push anything that sinks inside the body egg back out onto it, away from the legs.
+CO = np.empty(n * 3); me.vertices.foreach_get('co', CO); CO = CO.reshape(-1, 3)
+x, y, z = CO.T
+k0 = np.linalg.norm((CO - CEN) / RAD, axis=1)
+on_egg = CEN + (CO - CEN) / np.maximum(k0, 1e-6)[:, None]
+leg_tree = kdtree.KDTree(int((R == 2).sum()))
+for i in np.where(R == 2)[0]:
+    leg_tree.insert(CO[i], int(i))
+leg_tree.balance()
+leg_d = np.array([leg_tree.find(c)[2] for c in CO])
+BOT_R = float(os.environ.get('BOT_R', 0.05))
+bot_d = np.linalg.norm(CO - BOT_C, axis=1)
+bot = (R == 0) * (1 - sstep(BOT_R * 0.6, BOT_R, bot_d)) * sstep(0.004, 0.02, leg_d)
+taubin(me, int(os.environ.get('BOT_SMOOTH', 120)), lam=0.5, mu=0.0, weight=bot)
+taubin(me, 25, weight=bot)
+CO = np.empty(n * 3); me.vertices.foreach_get('co', CO); CO = CO.reshape(-1, 3)
+k0 = np.linalg.norm((CO - CEN) / RAD, axis=1)
+on_egg = CEN + (CO - CEN) / np.maximum(k0, 1e-6)[:, None]
+w = bot * sstep(1.0, 0.94, k0)
+print('BOTTOM verts', int((bot > 0.5).sum()), 'inside egg', int((w > 0.5).sum()))
+for _ in range(3):
+    CO += (on_egg - CO) * w[:, None]
+    me.vertices.foreach_set('co', CO.ravel()); me.update()
+    taubin(me, 6, weight=np.maximum(bot, 0))
+    CO = np.empty(n * 3); me.vertices.foreach_get('co', CO); CO = CO.reshape(-1, 3)
+    k0 = np.linalg.norm((CO - CEN) / RAD, axis=1)
+    on_egg = CEN + (CO - CEN) / np.maximum(k0, 1e-6)[:, None]
+    w = bot * sstep(1.0, 0.94, k0)
+tb = Vector((0, JRAW['tail'][0].y, JRAW['tail'][0].z))      # where the old tail joined (repainted later)
 me.attributes.new('part', 'FLOAT', 'POINT').data.foreach_set('value', [0.0] * n)
 
 # ================================================================ new hands, feet and tail
@@ -441,6 +482,7 @@ Al = VL[legs] * gain[legs]
 ROPE_COL = np.median(Al + (target / (target @ LUM) * (Al @ LUM)[:, None] - Al) * 0.6, axis=0)
 print('ROPE evened', ROPE_COL.round(3))
 gain[part != 0] = 1.0
+
 me.attributes.new('gain', 'FLOAT_VECTOR', 'POINT').data.foreach_set('vector', (gain / 2).ravel())
 
 select_only(mesh)
@@ -506,6 +548,60 @@ m = sstep(0.07, 0.22, C @ LUM)
 col = C + (Lg - C) * m[..., None]
 px_, py_, pz_ = np.abs(POS[..., 0]), POS[..., 1], POS[..., 2]
 fz = (np.sin(px_ * 2300 + pz_ * 1700) * np.sin(py_ * 2100 - px_ * 900) + np.sin(pz_ * 3100 + py_ * 1300)) * 0.5
+fur = target * (1 + 0.06 * fz)[..., None]
+# His bottom: the scan there is the puppet's opening, all shadow and inside lining. Repaint it in clean
+# white fur, and draw the stripe that runs across under his tail (the lowest stripe on each side curves
+# down and the two meet there) as one clean band. Worked out around the hole centre BOT_C: angle a in the
+# plane of his bottom (-90 = straight towards the tail, 0/-180 = his sides), r = distance from the centre.
+body = (PT == 0)
+bu = np.array([1.0, 0, 0])
+bn = (BOT_C - CEN) / np.linalg.norm(BOT_C - CEN)
+bv = np.cross(bn, bu)
+rel3 = POS - BOT_C
+r_px = np.linalg.norm(rel3, axis=-1)
+a_px = np.degrees(np.arctan2(rel3 @ bv, rel3 @ bu))
+fold = np.where(a_px < -90, -180 - a_px, a_px)          # mirror the left half onto the right
+back = a_px < 0
+# band centre line (angle, radius), measured on the scan, from straight back out to where it meets the side stripe
+BAND = np.array([(-90, 0.049), (-60, 0.047), (-40, 0.054), (-25, 0.068), (-12, 0.084), (-4, 0.092)])
+rc = np.interp(fold, BAND[:, 0], BAND[:, 1])
+BAND_W = float(os.environ.get('BAND_W', 0.0105))      # half width
+band = (1 - sstep(BAND_W - 0.003, BAND_W + 0.003, np.abs(r_px - rc) + 0.0022 * fz)) * back * (fold < -6)
+# clean area: out to just past the band at the back, smaller at the front so the stripe between the legs stays
+clean_r = np.where(back, rc + BAND_W + 0.014, 0.05)
+clean_r = np.where(back & (fold > -30), np.minimum(clean_r, 0.07), clean_r)
+clean = (1 - sstep(clean_r - 0.012, clean_r, r_px)) * body
+col = col + (fur - col) * clean[..., None]
+lc = col @ LUM
+dark_px = body & (lc > 0.004) & (lc < 0.035) & (POS[..., 2] > 0.8) & (POS[..., 2] < 0.95) & (r_px > 0.1)
+STRIPE_COL = np.median(col[dark_px], axis=0)
+print('STRIPE colour', STRIPE_COL.round(3), 'from', int(dark_px.sum()), 'px; band px', int((band > 0.5).sum()))
+col = col + (STRIPE_COL * (1 + 0.08 * fz)[..., None] - col) * (band * body)[..., None]
+
+# Lower back and tail base: the scan has shadow here (grey fur) and a brown speck where the old tail was
+# sewn on. Keep the stripes, lift the grey back to clean white, and give the darkest bits the stripe colour.
+rt = np.linalg.norm(POS - np.array(tb), axis=-1)
+tidy = np.maximum((1 - sstep(0.03, 0.04, rt)), back * (1 - sstep(0.1, 0.12, r_px))) * body * (1 - band)
+relc = (col @ LUM) / (target @ LUM)
+# stripes are navy, shadow is neutral grey or brownish: tell them apart by how blue a dark pixel is
+blue = col[..., 2] / np.maximum(col[..., :2].mean(-1), 1e-5)
+reg = tidy > 0.5
+print('TIDY blueness of dark px', np.histogram(blue[reg & (relc < 0.3)], bins=8, range=(0.6, 2.2))[0])
+stripe_like = sstep(float(os.environ.get('BLUE_LO', 1.15)), float(os.environ.get('BLUE_HI', 1.35)), blue) * (1 - sstep(0.3, 0.5, relc))
+near_t = 1 - sstep(0.03, 0.04, rt)
+below = near_t * sstep(tb.z - 0.006, tb.z - 0.016, POS[..., 2])     # just under the rope: no stripe there
+level = near_t * (1 - below)
+stripe_like = np.maximum(stripe_like, level * (1 - sstep(0.15, 0.3, relc)))   # the stripe right at the rope
+def box_blur(a, k=2):
+    for ax in (0, 1):
+        a = sum(np.roll(a, i, axis=ax) for i in range(-k, k + 1)) / (2 * k + 1)
+    return a
+stripe_like = box_blur(box_blur(stripe_like))
+stripe_like = sstep(0.3, 0.6, stripe_like)                         # solid stripes with soft edges
+lift = 1 - stripe_like
+dark = np.maximum(level * (1 - sstep(0.15, 0.3, relc)), 0.75 * stripe_like)
+col = col + (fur - col) * (tidy * lift)[..., None]
+col = col + (STRIPE_COL * (1 + 0.08 * fz)[..., None] - col) * (tidy * dark)[..., None]
 for pid, base_col, amp in ((PART['pom'], POM_COL, 0.10), (PART['tuft'], TUFT_COL, 0.12), (PART['hair'], TUFT_COL * 1.3, 0.14), (PART['rope'], ROPE_COL, 0.0)):
     c_ = base_col * (1 + amp * fz)[..., None]
     if pid == PART['rope']:
