@@ -1578,7 +1578,7 @@ body:has(.modal[open]) { overflow: hidden; }
 .flyer-hero {
   display: grid;
   place-items: center;
-  padding: clamp(3.5rem, 8vw, 6.5rem) var(--pad);
+  padding: clamp(2.25rem, 3vw, 2.75rem) var(--pad) clamp(3.5rem, 8vw, 6.5rem);  /* sits up near the header, with room for the corner sticker */
 }
 .flyer {
   position: relative;
@@ -1637,69 +1637,19 @@ body:has(.modal[open]) { overflow: hidden; }
 }
 .flyer__sticker b { font-family: var(--display); font-size: 1.8rem; letter-spacing: 0; }
 
-/* the acid smiley: classic acid-house face, melting at the chin, in a spinning neon halo */
+/* the acid smiley (an inline SVG in drops.html): melting, filled with marbled, flowing neon */
 .smiley {
-  --s: clamp(5rem, 11vw, 6.75rem);
-  --yellow: #ffe81a;
-  position: relative;
+  --s: clamp(6rem, 13vw, 8.5rem);
+  display: block;
   width: var(--s);
-  height: var(--s);
-  margin: calc(var(--s) * 0.25 + 1.25rem) auto calc(var(--s) * 0.62) !important;  /* room for the halo above and the drips below */
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff8a8, var(--yellow) 45%, #f5c800);
-  border: calc(var(--s) * 0.05) solid var(--ink);
+  height: calc(var(--s) * 1.18);
+  margin: 1.75rem auto 2rem !important;
+  overflow: visible;
+  filter: drop-shadow(0 0 0.9rem rgb(255 243 92 / 0.25));
+  transform-origin: 50% 40%;
   animation: smiley-bob calc(var(--beat) * 2) ease-in-out infinite alternate;
 }
-.smiley::before {
-  content: "";
-  position: absolute;
-  inset: calc(var(--s) * -0.2);
-  z-index: -1;
-  border-radius: 50%;
-  background: conic-gradient(var(--acid), var(--pink), var(--uv), var(--cyan), var(--acid));
-  -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%, #000 66%, transparent 68%);
-  mask: radial-gradient(circle, transparent 58%, #000 60%, #000 66%, transparent 68%);
-  filter: blur(1px) drop-shadow(0 0 6px rgb(255 42 147 / 0.6));
-  animation: halo 6s linear infinite;
-}
-.smiley i {
-  position: absolute;
-  top: 24%;
-  width: 13%;
-  height: 27%;
-  border-radius: 50%;
-  background: var(--ink);
-}
-.smiley i:first-of-type { left: 29%; }
-.smiley i:last-of-type { right: 29%; }
-/* the grin, with the little dimples at each end */
-.smiley::after {
-  content: "";
-  position: absolute;
-  left: 15%;
-  right: 15%;
-  top: 30%;
-  height: 46%;
-  border: calc(var(--s) * 0.075) solid var(--ink);
-  border-color: transparent transparent var(--ink);
-  border-radius: 50%;
-}
-/* drips: the face melting off its bottom edge */
-.smiley__drip {
-  position: absolute;
-  top: 82%;
-  z-index: 1;
-  width: 12%;
-  border: calc(var(--s) * 0.04) solid var(--ink);
-  border-top: 0;
-  border-radius: 0 0 999px 999px;
-  background: linear-gradient(var(--yellow), #f5c800);
-}
-.smiley__drip:nth-of-type(1) { left: 26%; height: 34%; transform: rotate(4deg); }
-.smiley__drip:nth-of-type(2) { left: 46%; height: 48%; width: 14%; }
-.smiley__drip:nth-of-type(3) { left: 64%; height: 26%; transform: rotate(-5deg); }
-@keyframes smiley-bob { from { transform: rotate(-8deg); } to { transform: rotate(8deg) translateY(-3px); } }
-@keyframes halo { to { transform: rotate(1turn); } }
+@keyframes smiley-bob { from { transform: rotate(-6deg); } to { transform: rotate(6deg) translateY(-3px); } }
 
 .flyer__details {
   display: grid;
@@ -1767,4 +1717,4 @@ body:has(.modal[open]) { overflow: hidden; }
   .flyer__sticker b { font-size: 1.35rem; }
   .clock div { min-width: 3.6rem; }
 }
-@media (prefers-reduced-motion: reduce) { .smiley, .smiley::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .smiley { animation: none; } }

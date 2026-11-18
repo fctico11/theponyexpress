@@ -12,6 +12,11 @@
     return e;
   };
 
+  // ---- the smiley's flowing colours stop for anyone who asks for less motion
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll("svg.smiley").forEach((svg) => svg.pauseAnimations && svg.pauseAnimations());
+  }
+
   // ---- the teaser
   document.querySelectorAll("[data-drop-no]").forEach((n) => { n.textContent = cur.no; });
   $("drop-title").textContent = cur.title;
