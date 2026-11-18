@@ -217,10 +217,11 @@ if (input) input.addEventListener("input", () => {
         vec2 q = fract(g) - 0.5;
         float d = length(q);
         float ring = length(id + 0.5);
-        float size = 0.36 + 0.1 * sin(ring * 0.6 - t * 5.0);
-        band = (1.0 - smoothstep(size - 0.05, size, d)) * smoothstep(0.07, 0.12, d);
-        k1 = 0.5 + 0.5 * sin(id.x * 0.45 + id.y * 0.3 + t * 2.0);
-        k2 = 0.5 + 0.5 * sin(ring * 0.45 - t * 1.6);
+        // Kept dim and gently pulsing so it stays a backdrop, not a strobe.
+        float size = 0.36 + 0.04 * sin(ring * 0.6 - t * 3.0);
+        band = (1.0 - smoothstep(size - 0.05, size, d)) * smoothstep(0.07, 0.12, d) * 0.4;
+        k1 = 0.5 + 0.5 * sin(id.x * 0.45 + id.y * 0.3 + t * 1.2);
+        k2 = 0.5 + 0.5 * sin(ring * 0.45 - t * 1.0);
       } else if (u_mode > 0.5) {
         // Spiral: four striped arms winding slowly into the centre.
         p += (u_mouse - 0.5) * 0.25;
