@@ -36,10 +36,17 @@ if (form) form.addEventListener("submit", async (event) => {
   try {
     await subscribe(email);
     form.reset();
-    say("You're on the route. Marty's lacing up.");
-    // Marty does a little dance to celebrate (a looping flipbook)
-    const flip = document.getElementById("signup-flip");
-    if (flip) flip.hidden = false;
+    // Swap the form for the "you're in" card, where Marty dances to celebrate
+    const ask = document.getElementById("join-ask");
+    const done = document.getElementById("join-done");
+    if (ask && done) {
+      ask.hidden = true;
+      done.hidden = false;
+      done.querySelector("h2").focus({ preventScroll: true });
+      done.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      say("You're on the route. Marty's lacing up.");
+    }
   } catch {
     say("That didn't go through. Give it another try in a minute.", true);
   }
