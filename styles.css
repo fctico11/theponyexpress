@@ -1732,7 +1732,7 @@ body:has(.modal[open]) { overflow: hidden; }
   --fw: clamp(9rem, 28vw, 12rem);                      /* one frame's width; frames are 306 x 320 */
   width: var(--fw);
   height: calc(var(--fw) * 320 / 306);
-  background: url("images/marty-dance-flip.webp") 0 0 / calc(var(--fw) * 8) 100% no-repeat;
+  background: url("images/marty-dance-flip.webp?v=5") 0 0 / calc(var(--fw) * 8) 100% no-repeat;
   animation: flipbook calc(var(--beat) * 2) steps(8) infinite;
   filter: drop-shadow(0 0 1.25rem rgb(255 42 147 / 0.35));
 }
