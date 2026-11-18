@@ -1540,3 +1540,14 @@ body:has(.modal[open]) { overflow: hidden; }
   .ticket--vip::after { animation: none; }
   .ticket, .ticket--vip, .ticket:hover { transition: none; }
 }
+
+/* Set times runs straight into the tickets: tighter spacing, and the background fades across */
+.inside:has(+ .tickets) { padding-bottom: clamp(2rem, 4vw, 3.5rem); border-bottom: 0; }
+.inside + .tickets {
+  margin-top: -1px;
+  padding-top: clamp(2.5rem, 5vw, 4.5rem);
+  background:
+    radial-gradient(ellipse 45% 55% at 22% 62%, rgb(198 255 31 / 0.16), transparent 70%),
+    radial-gradient(ellipse 45% 55% at 78% 58%, rgb(255 42 147 / 0.2), transparent 70%),
+    linear-gradient(var(--ink-2), var(--ink) 22rem);
+}
