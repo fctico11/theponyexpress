@@ -14,6 +14,7 @@
   --mono: "DM Mono", ui-monospace, monospace;
 
   --pad: clamp(1.25rem, 4vw, 3.5rem);
+  --section-y: clamp(3rem, 6vw, 5rem); /* top and bottom space inside each section */
   --beat: 0.4286s; /* one beat at 140 BPM */
   --echo: 0.045em 0.045em 0 var(--pink), 0.09em 0.09em 0 var(--uv);
 }
@@ -338,7 +339,7 @@ a { color: inherit; }
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(3rem, 6vw, 6rem);
-  padding: clamp(5rem, 10vw, 9rem) var(--pad);
+  padding: var(--section-y) var(--pad);
 }
 
 .frame {
@@ -374,7 +375,7 @@ a { color: inherit; }
 /* ---------- Set times ---------- */
 
 .inside {
-  padding: clamp(4rem, 9vw, 8rem) var(--pad);
+  padding: var(--section-y) var(--pad);
   background: var(--ink-2);
   border-block: 1px solid var(--line);
 }
@@ -460,7 +461,7 @@ a { color: inherit; }
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(2rem, 5vw, 5rem);
-  padding: clamp(5rem, 10vw, 9rem) var(--pad);
+  padding: var(--section-y) var(--pad);
 }
 
 .marty__art {
@@ -509,7 +510,7 @@ a { color: inherit; }
 
 /* ---------- Join ---------- */
 
-.join { padding: clamp(4rem, 10vw, 9rem) var(--pad); }
+.join { padding: var(--section-y) var(--pad); }
 
 .join__card {
   max-width: 46rem;
@@ -731,7 +732,7 @@ a { color: inherit; }
 .dance {
   background: var(--ink);
   border-top: 1px solid var(--line);
-  padding: clamp(4rem, 9vw, 8rem) var(--pad);
+  padding: var(--section-y) var(--pad);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
   gap: clamp(2rem, 5vw, 5rem);
@@ -805,7 +806,7 @@ a { color: inherit; }
 
 /* ---------- Backstory ---------- */
 
-.story { background: var(--ink); padding: clamp(5rem, 10vw, 9rem) var(--pad); }
+.story { background: var(--ink); padding: var(--section-y) var(--pad); }
 
 .chapters {
   list-style: none;
@@ -836,7 +837,7 @@ a { color: inherit; }
 .spot {
   background: var(--acid);
   color: var(--ink);
-  padding: clamp(4rem, 9vw, 8rem) var(--pad);
+  padding: var(--section-y) var(--pad);
   border-block: 3px solid var(--ink);
 }
 .spot .tag { color: var(--ink); }
@@ -893,7 +894,7 @@ a { color: inherit; }
 
 /* ---------- Gallery ---------- */
 
-.evidence { background: var(--ink); padding: clamp(5rem, 10vw, 9rem) var(--pad); }
+.evidence { background: var(--ink); padding: var(--section-y) var(--pad); }
 
 .gallery {
   display: grid;
@@ -1032,7 +1033,7 @@ a { color: inherit; }
   50% { transform: translateY(4%) rotate(2.5deg); }
 }
 
-.shop { background: var(--ink); padding: clamp(4rem, 9vw, 8rem) var(--pad); }
+.shop { background: var(--ink); padding: var(--section-y) var(--pad); }
 
 .products {
   list-style: none;
@@ -1094,7 +1095,7 @@ a { color: inherit; }
 .shop-notes {
   background: var(--ink-2);
   border-block: 1px solid var(--line);
-  padding: clamp(4rem, 9vw, 7rem) var(--pad);
+  padding: var(--section-y) var(--pad);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1157,7 +1158,7 @@ a { color: inherit; }
   47%, 51% { opacity: 0.55; }
 }
 
-.rooms { background: var(--ink); padding: clamp(4rem, 9vw, 8rem) var(--pad); }
+.rooms { background: var(--ink); padding: var(--section-y) var(--pad); }
 .rooms__list {
   list-style: none;
   margin: 0;
@@ -1191,7 +1192,7 @@ a { color: inherit; }
   padding: 0.35rem 0.6rem;
 }
 
-.rules { background: var(--ink-2); border-top: 1px solid var(--line); padding: clamp(4rem, 9vw, 7rem) var(--pad); }
+.rules { background: var(--ink-2); border-top: 1px solid var(--line); padding: var(--section-y) var(--pad); }
 .rules__list { list-style: none; margin: 0; padding: 0; max-width: 46rem; counter-reset: rule; }
 .rules__list li {
   counter-increment: rule;
@@ -1239,7 +1240,7 @@ a { color: inherit; }
 
 .faq {
   background: var(--ink);
-  padding: clamp(3.5rem, 8vw, 6rem) var(--pad);
+  padding: var(--section-y) var(--pad);
   display: grid;
   grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
   gap: clamp(2rem, 5vw, 5rem);
@@ -1346,7 +1347,7 @@ body:has(.modal[open]) { overflow: hidden; }
 .tickets {
   position: relative;
   overflow: hidden;
-  padding: clamp(4rem, 9vw, 8rem) var(--pad);
+  padding: var(--section-y) var(--pad);
   background:
     radial-gradient(ellipse 45% 55% at 22% 62%, rgb(198 255 31 / 0.16), transparent 70%),
     radial-gradient(ellipse 45% 55% at 78% 58%, rgb(255 42 147 / 0.2), transparent 70%),
@@ -1636,40 +1637,69 @@ body:has(.modal[open]) { overflow: hidden; }
 }
 .flyer__sticker b { font-family: var(--display); font-size: 1.8rem; letter-spacing: 0; }
 
-/* the acid smiley */
+/* the acid smiley: classic acid-house face, melting at the chin, in a spinning neon halo */
 .smiley {
+  --s: clamp(5rem, 11vw, 6.75rem);
+  --yellow: #ffe81a;
   position: relative;
-  width: clamp(4rem, 9vw, 5.5rem);
-  height: clamp(4rem, 9vw, 5.5rem);
-  margin: 0 auto;
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) * 0.25 + 1.25rem) auto calc(var(--s) * 0.62) !important;  /* room for the halo above and the drips below */
   border-radius: 50%;
-  background: var(--acid);
-  border: 3px solid var(--ink);
-  box-shadow: 0 0 0 3px var(--acid), 0 0 1.5rem rgb(198 255 31 / 0.35);
+  background: radial-gradient(circle at 35% 30%, #fff8a8, var(--yellow) 45%, #f5c800);
+  border: calc(var(--s) * 0.05) solid var(--ink);
   animation: smiley-bob calc(var(--beat) * 2) ease-in-out infinite alternate;
+}
+.smiley::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--s) * -0.2);
+  z-index: -1;
+  border-radius: 50%;
+  background: conic-gradient(var(--acid), var(--pink), var(--uv), var(--cyan), var(--acid));
+  -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%, #000 66%, transparent 68%);
+  mask: radial-gradient(circle, transparent 58%, #000 60%, #000 66%, transparent 68%);
+  filter: blur(1px) drop-shadow(0 0 6px rgb(255 42 147 / 0.6));
+  animation: halo 6s linear infinite;
 }
 .smiley i {
   position: absolute;
-  top: 30%;
-  width: 11%;
-  height: 22%;
+  top: 24%;
+  width: 13%;
+  height: 27%;
   border-radius: 50%;
   background: var(--ink);
 }
-.smiley i:first-child { left: 31%; }
-.smiley i:last-child { right: 31%; }
+.smiley i:first-of-type { left: 29%; }
+.smiley i:last-of-type { right: 29%; }
+/* the grin, with the little dimples at each end */
 .smiley::after {
   content: "";
   position: absolute;
-  left: 22%;
-  right: 22%;
-  top: 38%;
-  height: 38%;
-  border: 0.32rem solid var(--ink);
+  left: 15%;
+  right: 15%;
+  top: 30%;
+  height: 46%;
+  border: calc(var(--s) * 0.075) solid var(--ink);
   border-color: transparent transparent var(--ink);
   border-radius: 50%;
 }
+/* drips: the face melting off its bottom edge */
+.smiley__drip {
+  position: absolute;
+  top: 82%;
+  z-index: 1;
+  width: 12%;
+  border: calc(var(--s) * 0.04) solid var(--ink);
+  border-top: 0;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(var(--yellow), #f5c800);
+}
+.smiley__drip:nth-of-type(1) { left: 26%; height: 34%; transform: rotate(4deg); }
+.smiley__drip:nth-of-type(2) { left: 46%; height: 48%; width: 14%; }
+.smiley__drip:nth-of-type(3) { left: 64%; height: 26%; transform: rotate(-5deg); }
 @keyframes smiley-bob { from { transform: rotate(-8deg); } to { transform: rotate(8deg) translateY(-3px); } }
+@keyframes halo { to { transform: rotate(1turn); } }
 
 .flyer__details {
   display: grid;
@@ -1696,7 +1726,7 @@ body:has(.modal[open]) { overflow: hidden; }
   gap: clamp(2.5rem, 6vw, 6rem);
   align-items: start;
   background: var(--ink);
-  padding: clamp(4rem, 9vw, 8rem) var(--pad);
+  padding: var(--section-y) var(--pad);
 }
 .teaser__copy > * + * { margin-top: 1.25rem; }
 .teaser__blurb p { color: var(--dim); max-width: 36rem; }
@@ -1718,7 +1748,7 @@ body:has(.modal[open]) { overflow: hidden; }
 .tracklist__name { font-weight: 700; }
 .tracklist__foot { margin-top: 1rem; font-size: 0.85rem; color: var(--dim); }
 
-.archive { background: var(--ink-2); border-top: 1px solid var(--line); padding: clamp(4rem, 9vw, 7rem) var(--pad); }
+.archive { background: var(--ink-2); border-top: 1px solid var(--line); padding: var(--section-y) var(--pad); }
 .archive__empty { color: var(--dim); font-family: var(--mono); font-size: 0.85rem; letter-spacing: 0.08em; }
 .archive__list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: 2rem; }
 .archive__item { border: 2px solid var(--line); padding: 1.25rem; display: grid; gap: 0.5rem; }
@@ -1737,4 +1767,4 @@ body:has(.modal[open]) { overflow: hidden; }
   .flyer__sticker b { font-size: 1.35rem; }
   .clock div { min-width: 3.6rem; }
 }
-@media (prefers-reduced-motion: reduce) { .smiley { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .smiley, .smiley::before { animation: none; } }
