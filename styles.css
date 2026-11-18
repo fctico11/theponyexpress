@@ -466,18 +466,27 @@ a { color: inherit; }
   place-items: center;
   overflow: hidden;
   border: 3px solid var(--white);
-  background: var(--uv);
+  background: var(--ink);
 }
+/* The warped checkerboard behind him, kept quiet so Marty does the talking */
 .marty__art::before {
   content: "";
   position: absolute;
   inset: -30%;
   background: conic-gradient(var(--ink) 25%, var(--acid) 0 50%, var(--ink) 0 75%, var(--pink) 0) 0 0 / 110px 110px;
   filter: url(#warp);
-  animation: drift 40s linear infinite;
+  opacity: 0.22;
+  animation: drift 90s linear infinite;
+}
+.marty__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 30%, rgb(5 5 6 / 0.7) 85%);
+  pointer-events: none;
 }
 @keyframes drift { to { transform: rotate(360deg); } }
-.marty__art img { position: relative; width: 88%; transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.marty__art img { position: relative; z-index: 1; width: 88%; transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1); }
 .marty__art:hover img { transform: rotate(-5deg) scale(1.05); }
 
 .marty__copy > * + * { margin-top: 1.25rem; }
@@ -1202,3 +1211,124 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .neon span:last-child { animation: none; }
 }
+
+/* ==========================================================================
+   FAQ
+   ========================================================================== */
+
+.faq-hero {
+  display: grid;
+  place-items: center;
+  padding: clamp(4rem, 10vw, 8rem) var(--pad);
+}
+.faq-hero__card {
+  max-width: 44rem;
+  background: var(--ink);
+  border: 3px solid var(--acid);
+  box-shadow: 9px 9px 0 var(--pink), 18px 18px 0 var(--uv);
+  padding: clamp(1.75rem, 5vw, 3.5rem);
+  text-align: center;
+}
+.faq-hero__card > * + * { margin-top: 1.25rem; }
+.faq-hero h1 { font-size: clamp(2rem, 7vw, 4.75rem); text-shadow: var(--echo); }
+.faq-hero .lede { color: var(--dim); }
+
+.faq {
+  background: var(--ink);
+  padding: clamp(3.5rem, 8vw, 6rem) var(--pad);
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+.faq__jump {
+  position: sticky;
+  top: 5.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.faq__jump a { text-decoration: none; padding: 0.5rem 0; border-bottom: 1px solid var(--line); }
+.faq__jump a:hover { color: var(--acid); }
+.faq__groups { display: grid; gap: clamp(3rem, 6vw, 4.5rem); max-width: 48rem; }
+.faq__group h2 { font-size: clamp(1.5rem, 3.4vw, 2.6rem); margin-bottom: 1.25rem; }
+.faq details { border-top: 1px solid var(--line); }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: "+";
+  font-family: var(--mono);
+  color: var(--pink);
+  transition: transform 0.2s ease;
+}
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq summary:hover { color: var(--acid); }
+.faq details p { color: var(--dim); padding: 0 2rem 1.25rem 0; max-width: 40rem; }
+.faq details strong { color: var(--white); }
+.faq details a, .faq-hero a, .modal a { color: var(--acid); }
+
+@media (max-width: 860px) {
+  .faq { grid-template-columns: minmax(0, 1fr); }
+  .faq__jump { position: static; flex-direction: row; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+  .faq__jump a { border-bottom: 0; }
+}
+
+/* ---------- Footer extras: Instagram, and links that open a modal ---------- */
+
+.site-footer nav .footer__ig { margin-left: auto; color: var(--acid); }
+@media (max-width: 860px) { .site-footer nav .footer__ig { margin-left: 0; } }
+
+/* ==========================================================================
+   Modal (privacy policy)
+   ========================================================================== */
+
+.modal {
+  width: min(44rem, calc(100vw - 2rem));
+  max-height: min(85vh, 52rem);
+  padding: 0;
+  color: var(--white);
+  background: var(--ink);
+  border: 3px solid var(--acid);
+  box-shadow: 9px 9px 0 var(--pink), 18px 18px 0 var(--uv);
+}
+.modal::backdrop { background: rgb(5 5 6 / 0.78); backdrop-filter: blur(3px); }
+.modal__inner { padding: clamp(1.5rem, 4vw, 2.75rem); }
+.modal__inner > * + * { margin-top: 1rem; }
+.modal h2 { font-size: clamp(1.6rem, 4vw, 2.6rem); }
+.modal h3 { font-size: 1rem; margin-top: 1.75rem; color: var(--acid); }
+.modal p, .modal li { color: var(--dim); }
+.modal ul { padding-left: 1.2rem; }
+.modal li + li { margin-top: 0.4rem; }
+.modal__updated { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.modal__close {
+  position: sticky;
+  top: 0;
+  float: right;
+  margin: 0.75rem 0.75rem 0 0;
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--acid);
+  border: 2px solid var(--ink);
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  z-index: 1;
+}
+.modal__close:hover { background: var(--white); }
+body:has(.modal[open]) { overflow: hidden; }

@@ -334,3 +334,76 @@ if (input) input.addEventListener("input", () => {
   resize();
   draw(40);
 })();
+
+// ---------------------------------------------------------------------------
+// Privacy policy: a modal opened from the footer's "Privacy" link (or any link to #privacy).
+// Edit the policy text here; every page uses this one copy.
+// ---------------------------------------------------------------------------
+const PRIVACY_HTML = `
+  <p class="modal__updated">Last updated: November 17, 2026</p>
+  <h2 id="privacy-title">Privacy</h2>
+  <p>The short version: we only collect what we need to get mail to your door, we never sell it, and you can ask us to delete it any time.</p>
+
+  <h3>What we collect</h3>
+  <ul>
+    <li><strong>Your email</strong>, when you join the waitlist or the route.</li>
+    <li><strong>Your name and US shipping address</strong>, when you subscribe or order from the shop.</li>
+    <li><strong>Payment details</strong> are handled by our payment provider. We never see or store your full card number.</li>
+  </ul>
+
+  <h3>What we use it for</h3>
+  <ul>
+    <li>Sending your monthly envelope and any shop orders.</li>
+    <li>Emails about your subscription, each drop, and the occasional news. Every email has an unsubscribe link.</li>
+    <li>Answering you when you get in touch.</li>
+  </ul>
+
+  <h3>Who else sees it</h3>
+  <p>We never sell or rent your details. We share them only with the services that help us run the club, like our email, payment and postage providers, and only what they need to do their job.</p>
+  <p>The site loads fonts from Google Fonts and 3D code from jsDelivr, so those services see your IP address when the page loads. Marty's tune only loads Spotify's player if you press play.</p>
+
+  <h3>Cookies</h3>
+  <p>We don't use advertising or tracking cookies.</p>
+
+  <h3>Your choices</h3>
+  <p>Unsubscribe from emails any time from the link in any email. To see, correct or delete what we hold about you, DM us on <a href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">Instagram @thezebraexpress</a>. We keep shipping and payment records only as long as the law requires.</p>
+
+  <h3>Kids</h3>
+  <p>The Zebra Express is for adults. We don't knowingly collect details from anyone under 18.</p>
+
+  <h3>Changes</h3>
+  <p>If this policy changes, we'll update the date at the top. If it's a big change, we'll email members first.</p>
+`;
+
+(function modals() {
+  let dialog = null;
+
+  function build() {
+    dialog = document.createElement("dialog");
+    dialog.className = "modal";
+    dialog.id = "privacy";
+    dialog.setAttribute("aria-labelledby", "privacy-title");
+    dialog.innerHTML = `<button class="modal__close" type="button">Close</button><div class="modal__inner">${PRIVACY_HTML}</div>`;
+    document.body.append(dialog);
+    dialog.querySelector(".modal__close").addEventListener("click", () => dialog.close());
+    // a click on the dimmed backdrop (outside the box) closes it too
+    dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+    dialog.addEventListener("close", () => {
+      if (location.hash === "#privacy") history.replaceState(null, "", location.pathname + location.search);
+    });
+  }
+
+  function open() {
+    if (!dialog) build();
+    if (!dialog.open) dialog.showModal();
+    dialog.scrollTop = 0;
+  }
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest('a[data-modal="privacy"], a[href="#privacy"]');
+    if (!link) return;
+    event.preventDefault();
+    open();
+  });
+  if (location.hash === "#privacy") open();
+})();

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAQ — The Zebra Express</title>
+  <meta name="description" content="How The Zebra Express works: price, shipping, cancelling, the shop and Marty. Monthly rave mail, US only, $6 a month.">
+  <!-- Social share card. The image URL must be absolute: change the domain here if the site lives elsewhere. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The Zebra Express">
+  <meta property="og:title" content="FAQ — The Zebra Express">
+  <meta property="og:description" content="How The Zebra Express works: price, shipping, cancelling, the shop and Marty. Monthly rave mail, US only, $6 a month.">
+  <meta property="og:url" content="https://thezebraexpress.com/faq.html">
+  <meta property="og:image" content="https://thezebraexpress.com/images/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Zebra Express: snail mail for ravers. A round badge of Marty the zebra in a pink mail cap, over psychedelic stripes.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#050506">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&family=Unbounded:wght@500;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <canvas id="trip" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="index.html" aria-label="The Zebra Express, home">
+      <img src="images/marty.webp" alt="" width="40" height="40">
+      <span>The Zebra Express</span>
+    </a>
+    <p class="bpm" aria-hidden="true"><i></i>140 BPM</p>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
+      <a class="btn btn--small" href="index.html#join">Get on the route</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="faq-hero window" id="top">
+      <div class="faq-hero__card">
+        <p class="tag">Info desk</p>
+        <h1>Questions?</h1>
+        <p class="lede">Everything about the route, the mail and the zebra. Still stuck? <a href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">DM us on Instagram</a>.</p>
+      </div>
+    </section>
+
+    <!-- QUESTIONS -->
+    <section class="faq">
+      <nav class="faq__jump" aria-label="Topics">
+        <a href="#basics">The basics</a>
+        <a href="#price">Price and billing</a>
+        <a href="#shipping">Shipping</a>
+        <a href="#shop">Shop and returns</a>
+        <a href="#marty">Marty and the Dancefloor</a>
+      </nav>
+
+      <div class="faq__groups">
+        <div class="faq__group" id="basics">
+          <h2>The basics</h2>
+          <details>
+            <summary>What is The Zebra Express?</summary>
+            <p>A snail-mail club for ravers. Once a month we pick one sound, one room or one era and pack an envelope with things we love about it. Then Marty sends it to your door.</p>
+          </details>
+          <details>
+            <summary>What's in the envelope?</summary>
+            <p>That's the fun part: it changes every month, and we keep it a surprise until it lands. Expect paper, music and little things worth keeping. No spoilers.</p>
+          </details>
+          <details>
+            <summary>How do I sign up?</summary>
+            <p><a href="index.html#join">Get on the route</a> with your email and we'll tell you the moment Drop 001 is ready to send.</p>
+          </details>
+        </div>
+
+        <div class="faq__group" id="price">
+          <h2>Price and billing</h2>
+          <details>
+            <summary>How much does it cost?</summary>
+            <p><strong>$6 a month</strong>, or <strong>$60 for the year</strong> paid up front. That's two months free. Shipping within the US is included.</p>
+          </details>
+          <details>
+            <summary>Can I cancel?</summary>
+            <p>Yes, any time, no questions asked. Cancel before the 1st and you won't be charged for the next drop. If you paid for the year, your envelopes keep coming until your year is up.</p>
+          </details>
+          <details>
+            <summary>When am I charged?</summary>
+            <p>Monthly members are charged when they sign up, then once a month before each drop goes out. Yearly members pay once, up front.</p>
+          </details>
+          <details>
+            <summary>Can I send it as a gift?</summary>
+            <p>Not yet, but it's on the list. Follow <a href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">@thezebraexpress</a> to hear when it's ready.</p>
+          </details>
+        </div>
+
+        <div class="faq__group" id="shipping">
+          <h2>Shipping</h2>
+          <details>
+            <summary>Where do you ship?</summary>
+            <p>The United States only, for now. We'd love to go further, and we'll shout about it when we can.</p>
+          </details>
+          <details>
+            <summary>When does my envelope go out?</summary>
+            <p>Every envelope leaves on the <strong>1st of the month</strong>. Join before then to get that month's drop. Join after, and your first one goes out on the 1st of the next month.</p>
+          </details>
+          <details>
+            <summary>How long does it take to arrive?</summary>
+            <p>It's real mail, so it moves at mail speed: usually within a week of the 1st, depending on where you live.</p>
+          </details>
+          <details>
+            <summary>I moved. How do I change my address?</summary>
+            <p>Update it before the 1st and that month's drop goes to your new place.</p>
+          </details>
+          <details>
+            <summary>My envelope never showed up.</summary>
+            <p>Mail happens. If it hasn't arrived by the 15th, <a href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">DM us</a> and we'll sort it out.</p>
+          </details>
+        </div>
+
+        <div class="faq__group" id="shop">
+          <h2>Shop and returns</h2>
+          <details>
+            <summary>Do shop orders ship to the same places?</summary>
+            <p>Yes: shop orders ship within the US only, just like the monthly mail.</p>
+          </details>
+          <details>
+            <summary>Can I return something from the shop?</summary>
+            <p>Yes. If it's not right, send it back unworn and in its original packaging within 30 days of delivery and we'll refund you. <a href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">DM us</a> to start a return.</p>
+          </details>
+          <details>
+            <summary>It arrived broken.</summary>
+            <p>Kandi takes a beating sometimes. Send us a photo within 30 days and we'll replace it or refund you, your pick.</p>
+          </details>
+        </div>
+
+        <div class="faq__group" id="marty">
+          <h2>Marty and the Dancefloor</h2>
+          <details>
+            <summary>Is Marty real?</summary>
+            <p>Very. He's a zebra finger puppet who goes to raves. <a href="marty.html">Read his story</a>.</p>
+          </details>
+          <details>
+            <summary>How do I meet him?</summary>
+            <p>Check <a href="marty.html#tour">where he'll be next</a>, look up for a zebra on a finger above the crowd, and say hi.</p>
+          </details>
+          <details>
+            <summary>What's the Dancefloor?</summary>
+            <p>The members-only space for people on the route. Your key arrives in your first envelope. <a href="dancefloor.html">Look inside</a>.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="join window">
+      <div class="join__card">
+        <p class="tag">Drop 001 leaves the stable soon</p>
+        <h2>Get on the route</h2>
+        <p>$6 a month, US only, out on the 1st. Leave whenever you like.</p>
+        <p><a class="btn" href="index.html#join">Join the route</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer__big">Ask the <span class="hl">zebra</span>.</p>
+    <nav aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
+      <a href="faq.html" aria-current="page">FAQ</a>
+      <a href="#privacy" data-modal="privacy">Privacy</a>
+      <a href="index.html#join">Join</a>
+      <a class="footer__ig" href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">Instagram @thezebraexpress</a>
+    </nav>
+    <p class="footer__fine">© 2026 The Zebra Express. Ships within the US only.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
