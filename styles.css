@@ -608,6 +608,12 @@ a { color: inherit; }
   .label { grid-template-columns: minmax(0, 1fr); }
   .label div + div { border-left: 0; border-top: 1px solid var(--line); }
   .signup .btn { width: 100%; }
+  /* hero on phones: a smaller tag, smaller buttons stacked on the left, and Marty dancing beside them */
+  .hero { min-height: 0; padding-bottom: 2.5rem; }
+  .hero > .tag { font-size: 0.62rem; letter-spacing: 0.12em; }
+  .hero__actions { flex-direction: column; align-items: flex-start; gap: 1rem; max-width: 58%; }
+  .hero__actions .btn { padding: 0.75rem 0.95rem; font-size: 0.74rem; letter-spacing: 0.08em; box-shadow: 3px 3px 0 var(--pink), 6px 6px 0 var(--uv); }
+  .hero__marty { width: 46vw; right: -0.25rem; bottom: 1.25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1718,3 +1724,17 @@ body:has(.modal[open]) { overflow: hidden; }
   .clock div { min-width: 3.6rem; }
 }
 @media (prefers-reduced-motion: reduce) { .smiley { animation: none; } }
+
+/* After a successful signup: cartoon Marty dancing, as an 8-frame flipbook on a loop (two beats per loop) */
+.flipbook { margin: 1.25rem 0 0.5rem; }
+.flipbook[hidden] { display: none; }
+.flipbook__frames {
+  --fw: clamp(9rem, 28vw, 12rem);                      /* one frame's width; frames are 306 x 320 */
+  width: var(--fw);
+  height: calc(var(--fw) * 320 / 306);
+  background: url("images/marty-dance-flip.webp") 0 0 / calc(var(--fw) * 8) 100% no-repeat;
+  animation: flipbook calc(var(--beat) * 2) steps(8) infinite;
+  filter: drop-shadow(0 0 1.25rem rgb(255 42 147 / 0.35));
+}
+@keyframes flipbook { to { background-position: calc(var(--fw) * -8) 0; } }
+@media (prefers-reduced-motion: reduce) { .flipbook__frames { animation: none; } }

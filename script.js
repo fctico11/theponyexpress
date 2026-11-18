@@ -37,6 +37,9 @@ if (form) form.addEventListener("submit", async (event) => {
     await subscribe(email);
     form.reset();
     say("You're on the route. Marty's lacing up.");
+    // Marty does a little dance to celebrate (a looping flipbook)
+    const flip = document.getElementById("signup-flip");
+    if (flip) flip.hidden = false;
   } catch {
     say("That didn't go through. Give it another try in a minute.", true);
   }
