@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drop 001: Origins of Rave — The Zebra Express</title>
+  <meta name="description" content="Drop 001 of The Zebra Express: Origins of Rave. Where rave came from and how it got to be what it is today, in the mail, in old-school neon.">
+  <!-- Social share card. The image URL must be absolute: change the domain here if the site lives elsewhere. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The Zebra Express">
+  <meta property="og:title" content="Drop 001: Origins of Rave — The Zebra Express">
+  <meta property="og:description" content="Where rave came from and how it got to be what it is today, in the mail, in old-school neon.">
+  <meta property="og:url" content="https://thezebraexpress.com/drops.html">
+  <meta property="og:image" content="https://thezebraexpress.com/images/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Zebra Express: snail mail for ravers. A round badge of Marty the zebra in a pink mail cap, over psychedelic stripes.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#050506">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&family=Unbounded:wght@500;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <canvas id="trip" data-mode="spiral" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="index.html" aria-label="The Zebra Express, home">
+      <img src="images/marty.webp" alt="" width="40" height="40">
+      <span>The Zebra Express</span>
+    </a>
+    <p class="bpm" aria-hidden="true"><i></i>140 BPM</p>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="drops.html" aria-current="page">Drops</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
+      <a class="btn btn--small" href="index.html#join">Get on the route</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- THE FLYER -->
+    <section class="flyer-hero window" id="top">
+      <article class="flyer">
+        <p class="flyer__presents">The Zebra Express presents</p>
+        <p class="flyer__sticker" aria-hidden="true">Drop<br><b data-drop-no>001</b></p>
+        <div class="smiley" aria-hidden="true"><i></i><i></i></div>
+        <h1 id="drop-title">Origins of Rave</h1>
+        <p class="flyer__kicker" id="drop-kicker">Where it all started, and how it got to be what it is today.</p>
+
+        <dl class="flyer__details">
+          <div><dt>Doors</dt><dd id="drop-when">Ship date coming soon</dd></div>
+          <div><dt>Admission</dt><dd>GA $6 · VIP $10</dd></div>
+          <div><dt>Dress code</dt><dd>Neon</dd></div>
+          <div><dt>Info line</dt><dd><a href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">@thezebraexpress</a></dd></div>
+        </dl>
+
+        <div class="clock" id="drop-clock" role="timer" aria-label="Time until this drop ships">
+          <div><b id="clock-d">00</b><span>Days</span></div>
+          <div><b id="clock-h">00</b><span>Hours</span></div>
+          <div><b id="clock-m">00</b><span>Mins</span></div>
+          <div><b id="clock-s">00</b><span>Secs</span></div>
+        </div>
+
+        <div class="hero__actions">
+          <a class="btn" href="index.html#join">Get on the route</a>
+          <a class="btn btn--ghost" href="#teaser">What's it about?</a>
+        </div>
+      </article>
+    </section>
+
+    <!-- THE TEASER -->
+    <section class="teaser" id="teaser">
+      <div class="teaser__copy">
+        <p class="tag">Drop <span data-drop-no>001</span> · The sound</p>
+        <h2>Back to the start</h2>
+        <div class="teaser__blurb" id="drop-blurb"></div>
+        <p class="teaser__extras"><span>In the bag</span> <span id="drop-extras"></span></p>
+      </div>
+
+      <div class="tracklist">
+        <p class="tracklist__head"><span>The zine</span><span>Side A</span></p>
+        <ol id="drop-chapters"></ol>
+        <p class="tracklist__foot">Chapter titles only. The rest is in the envelope.</p>
+      </div>
+    </section>
+
+    <!-- THE CRATE -->
+    <section class="archive" id="past">
+      <div class="section-head">
+        <p class="tag">The crate</p>
+        <h2>Past drops</h2>
+      </div>
+      <div id="drop-past"></div>
+    </section>
+
+    <!-- CTA -->
+    <section class="join window">
+      <div class="join__card">
+        <p class="tag">Don't miss the first one</p>
+        <h2>Get on the route</h2>
+        <p>GA $6 a month, VIP $10 a month. US only, out on the 1st. Leave whenever you like.</p>
+        <p><a class="btn" href="index.html#join">Join the route</a> <a class="btn btn--ghost" href="index.html#tickets">Compare tickets</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer__big">See you <span class="hl">at the start</span>.</p>
+    <nav aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="drops.html" aria-current="page">Drops</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
+      <a href="faq.html">FAQ</a>
+      <a href="#privacy" data-modal="privacy">Privacy</a>
+      <a href="index.html#join">Join</a>
+      <a class="footer__ig" href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">Instagram @thezebraexpress</a>
+    </nav>
+    <p class="footer__fine">© 2026 The Zebra Express. Ships within the US only.</p>
+  </footer>
+
+  <script src="drops-data.js"></script>
+  <script src="drops.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
