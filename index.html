@@ -155,40 +155,59 @@
     </section>
 
     <!-- TICKETS -->
-    <section class="tickets window" id="tickets">
+    <section class="tickets" id="tickets">
       <div class="section-head">
-        <p class="tag">Two ways in</p>
+        <p class="tag">At the door · Two ways in</p>
         <h2>Pick your ticket</h2>
       </div>
 
       <div class="tickets__list">
-        <article class="ticket">
-          <p class="ticket__tier">GA</p>
-          <h3>General Admission</h3>
-          <p class="ticket__price"><strong>$6</strong> a month</p>
-          <p class="ticket__year">or $60 for the year, two months free</p>
-          <ul>
-            <li>The zine</li>
-            <li>A flyer print and stickers</li>
-            <li>Letters from the floor</li>
-            <li>The Trainspotter quiz</li>
-          </ul>
-          <p class="ticket__mail">Arrives as a flat envelope</p>
-          <a class="btn btn--ghost" href="#join">Get GA</a>
+        <article class="ticket ticket--ga">
+          <div class="ticket__main">
+            <p class="ticket__head"><span>The Zebra Express</span><span>Admit one · monthly</span></p>
+            <h3>General Admission</h3>
+            <p class="ticket__price"><strong>$6</strong><span>/ month</span></p>
+            <p class="ticket__year">or $60 for the year, two months free</p>
+            <ul>
+              <li>The zine</li>
+              <li>A flyer print and stickers</li>
+              <li>Letters from the floor</li>
+              <li>The Trainspotter quiz</li>
+            </ul>
+            <div class="ticket__foot">
+              <p class="ticket__mail">Arrives as a flat envelope</p>
+              <a class="btn btn--ghost" href="#join">Get GA</a>
+            </div>
+          </div>
+          <div class="ticket__stub" aria-hidden="true">
+            <span class="ticket__tier">GA</span>
+            <span class="ticket__code">ZE-001 · No. 0001</span>
+            <span class="ticket__barcode"></span>
+          </div>
         </article>
 
         <article class="ticket ticket--vip">
-          <p class="ticket__tier">VIP</p>
-          <h3>VIP</h3>
-          <p class="ticket__price"><strong>$10</strong> a month</p>
-          <p class="ticket__year">or $100 for the year, two months free</p>
-          <ul>
-            <li>Everything in GA</li>
-            <li>A kandi single, strung by hand</li>
-            <li>A trinket from the Kandi Bag</li>
-          </ul>
-          <p class="ticket__mail">Arrives as a padded mailer</p>
-          <a class="btn" href="#join">Get VIP</a>
+          <p class="ticket__stamp" aria-hidden="true">Kandi<br>inside</p>
+          <div class="ticket__main">
+            <p class="ticket__head"><span>The Zebra Express</span><span>Admit one · all access</span></p>
+            <h3>VIP</h3>
+            <p class="ticket__price"><strong>$10</strong><span>/ month</span></p>
+            <p class="ticket__year">or $100 for the year, two months free</p>
+            <ul>
+              <li><strong>Everything in GA</strong></li>
+              <li>A kandi single, strung by hand</li>
+              <li>A trinket from the Kandi Bag</li>
+            </ul>
+            <div class="ticket__foot">
+              <p class="ticket__mail">Arrives as a padded mailer</p>
+              <a class="btn" href="#join">Get VIP</a>
+            </div>
+          </div>
+          <div class="ticket__stub" aria-hidden="true">
+            <span class="ticket__tier">VIP</span>
+            <span class="ticket__code">ZE-001 · No. 0001</span>
+            <span class="ticket__barcode"></span>
+          </div>
         </article>
       </div>
 
