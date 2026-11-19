@@ -1399,7 +1399,7 @@ body:has(.modal[open]) { overflow: hidden; }
   transform: rotate(-1.5deg);
   transition: transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1), box-shadow 0.35s ease;
 }
-.ticket--vip { --c: var(--pink); transform: rotate(1.5deg); margin-top: clamp(0rem, 3vw, 2.5rem); }
+.ticket--vip { --c: var(--pink); transform: rotate(1.5deg); }
 .ticket:hover { transform: rotate(0) translateY(-6px); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.6), 0 2rem 3.5rem -1rem rgb(0 0 0 / 0.9), 0 0 3.5rem 0 var(--c); }
 
 /* VIP: a holographic foil sheen that drifts across the ticket */
@@ -1531,7 +1531,7 @@ body:has(.modal[open]) { overflow: hidden; }
 
 @media (max-width: 860px) {
   .tickets__list { grid-template-columns: minmax(0, 1fr); max-width: 32rem; }
-  .ticket--vip { margin-top: 0; }
+  .tickets__list { grid-auto-rows: 1fr; }
 }
 @media (max-width: 420px) {
   /* the stub moves to the bottom, torn along a horizontal perforation */
