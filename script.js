@@ -102,7 +102,7 @@ if (input) input.addEventListener("input", () => {
 })();
 
 // ---------------------------------------------------------------------------
-// Background: slow zebra stripes drawn with WebGL, warped (home), lasers and fire (Marty), a bead pegboard (shop) or a lit floor (Dancefloor).
+// Background: slow zebra stripes drawn with WebGL, warped (home), lasers and fire (Marty), a bead pegboard (shop) or a lit floor (Dancefloor) or a halftone kaleidoscope (Art Tent).
 // Falls back to the CSS gradient on #trip if WebGL isn't available.
 // ---------------------------------------------------------------------------
 (function trip() {
@@ -198,14 +198,55 @@ if (input) input.addEventListener("input", () => {
     }
 
     void main() {
-      if (u_mode > 3.5) { gl_FragColor = vec4(pyro(), 1.0); return; }
+      if (u_mode > 3.5 && u_mode < 4.5) { gl_FragColor = vec4(pyro(), 1.0); return; }
       vec2 p = 1.35 * (gl_FragCoord.xy - 0.5 * u_res) / min(u_res.x, u_res.y);
       float t = u_time * 0.11;
       float band;
       float k1;
       float k2;
 
-      if (u_mode > 2.5) {
+      if (u_mode > 4.5) {
+        // Kaleido: a slowly turning kaleidoscope of striped lava blobs, printed in halftone
+        // like an old rave flyer. The classic chill-out room projection.
+        p += (u_mouse - 0.5) * 0.15;
+        float tc = u_time * 0.05;
+        float r = length(p);
+        float seg = 6.28318 / 8.0;
+        float ang = mod(atan(p.y, p.x) + tc * 0.6, seg);
+        ang = abs(ang - seg * 0.5);
+        vec2 q = r * vec2(cos(ang), sin(ang));
+        // A light fractal: smaller, fainter mirrored copies of the same blobs are tiled through
+        // each slice, twice over, so the pattern repeats inside itself.
+        float field = 0.0;
+        float weight = 1.0;
+        float scale = 1.0;
+        vec2 qq = q;
+        for (int o = 0; o < 3; o++) {
+          float fo = float(o);
+          for (int i = 0; i < 4; i++) {
+            float fi = float(i);
+            vec2 c = vec2(0.25 + 0.5 * (0.5 + 0.5 * sin(tc * (0.9 + 0.2 * fi) + fi * 2.1 + fo)),
+                          0.22 * (0.5 + 0.5 * cos(tc * (0.7 + 0.15 * fi) + fi * 1.3 - fo)));
+            vec2 d = qq - c * 1.4;
+            field += weight * (0.03 + 0.01 * sin(fi * 1.7)) / (dot(d, d) + 0.01);
+          }
+          scale *= 2.4;
+          weight *= 0.4;
+          qq = abs(mod(q * scale + vec2(tc * 0.4, 0.0), 1.4) - 0.7) * 1.4;   // mirror-tiled copies
+        }
+        field += 0.4 / (r * r + 0.15);   // a glowing eye in the middle
+        float wave = log(field) * 15.0 - u_time * 0.5;
+        float s = sin(wave);
+        float ring = floor(wave / 6.28318);   // each stripe gets its own colour, like a rainbow-ringed flyer
+        float stripe = smoothstep(-0.12, 0.12, s);
+        // Halftone dots in the dark gaps, bigger where the glow is stronger.
+        vec2 cell = fract(gl_FragCoord.xy / 7.0) - 0.5;
+        float glow = clamp(log(field) * 0.35, 0.0, 1.0);
+        float dots = smoothstep(0.05, 0.0, length(cell) - 0.42 * glow) * 0.55;
+        band = max(stripe * (0.45 + 0.5 * glow), dots) * smoothstep(0.0, 0.05, r);
+        k1 = step(0.5, fract(ring * 0.5));
+        k2 = step(0.5, fract(ring * 0.25));
+      } else if (u_mode > 2.5) {
         // Floor: lit tiles running to the horizon, re-rolled on the beat.
         float y = 0.16 + (u_mouse.y - 0.5) * 0.08 - p.y;
         float z = 1.0 / max(y, 0.02);
@@ -290,8 +331,8 @@ if (input) input.addEventListener("input", () => {
   const uRes = gl.getUniformLocation(prog, "u_res");
   const uTime = gl.getUniformLocation(prog, "u_time");
   const uMouse = gl.getUniformLocation(prog, "u_mouse");
-  // <canvas id="trip" data-mode="spiral"> "beads", "floor" or "pyro" switches the pattern.
-  gl.uniform1f(gl.getUniformLocation(prog, "u_mode"), ({ spiral: 1, beads: 2, floor: 3, pyro: 4 })[canvas.dataset.mode] || 0);
+  // <canvas id="trip" data-mode="spiral"> "beads", "floor", "pyro" or "kaleido" switches the pattern.
+  gl.uniform1f(gl.getUniformLocation(prog, "u_mode"), ({ spiral: 1, beads: 2, floor: 3, pyro: 4, kaleido: 5 })[canvas.dataset.mode] || 0);
 
   const mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
   window.addEventListener("pointermove", (e) => {
@@ -351,7 +392,7 @@ if (input) input.addEventListener("input", () => {
 // Edit the policy text here; every page uses this one copy.
 // ---------------------------------------------------------------------------
 const PRIVACY_HTML = `
-  <p class="modal__updated">Last updated: November 17, 2026</p>
+  <p class="modal__updated">Last updated: November 22, 2026</p>
   <h2 id="privacy-title">Privacy</h2>
   <p>The short version: we only collect what we need to get mail to your door, we never sell it, and you can ask us to delete it any time.</p>
 
@@ -359,6 +400,7 @@ const PRIVACY_HTML = `
   <ul>
     <li><strong>Your email</strong>, when you join the waitlist or the route.</li>
     <li><strong>Your name and US shipping address</strong>, when you subscribe or order from the shop.</li>
+    <li><strong>Your name, email and artwork</strong>, when you send work to the Art Tent. We only use your art the way the form says: in a drop, on this site and on Instagram, with credit.</li>
     <li><strong>Payment details</strong> are handled by our payment provider. We never see or store your full card number.</li>
   </ul>
 

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Art Tent: The Zebra Express</title>
+  <meta name="description" content="The Art Tent is where artists submit work for future drops of The Zebra Express. Send in drawings, paintings and digital art, made by hand with no AI, and the best pieces go out in the mail to every member.">
+  <!-- Social share card. URLs must be absolute. Using the Vercel address until thezebraexpress.com is verified; swap it back then. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The Zebra Express">
+  <meta property="og:title" content="The Art Tent: The Zebra Express">
+  <meta property="og:description" content="Artists, submit your work for future drops. The best pieces go out in the mail to every member, with your name on them.">
+  <meta property="og:url" content="https://theponyexpress.vercel.app/arttent.html">
+  <meta property="og:image" content="https://theponyexpress.vercel.app/images/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Zebra Express: snail mail for ravers. A round badge of Marty the zebra in a pink mail cap, over psychedelic stripes.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#050506">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&family=Unbounded:wght@500;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=10">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <canvas id="trip" data-mode="kaleido" aria-hidden="true"></canvas>
+
+  <header class="site-header">
+    <a class="wordmark" href="index.html" aria-label="The Zebra Express, home">
+      <img src="images/marty.webp?v=5" alt="" width="40" height="40">
+      <span>The Zebra Express</span>
+    </a>
+    <p class="bpm" aria-hidden="true"><i></i>140 BPM</p>
+    <nav aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="drops.html">Drops</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
+      <a href="arttent.html" aria-current="page">Submit art</a>
+      <a class="btn btn--small" href="index.html#join">Get on the route</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="tent-hero window" id="top">
+      <div class="tent-hero__card">
+        <p class="tag">Artist submissions · Open call</p>
+        <h1><span>The Art</span> <span>Tent</span></h1>
+        <p class="lede">Artists, this one's yours. Submit your drawings, paintings and digital art for future drops of The Zebra Express. The best pieces go out in the mail to every member, with your name on them.</p>
+        <div class="hero__actions">
+          <a class="btn" href="#submit">Submit your art</a>
+          <a class="btn btn--ghost" href="#brief">See the brief</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE BRIEF -->
+    <section class="brief" id="brief">
+      <div class="brief__copy">
+        <p class="tag" id="brief-tag">Now booking · Future drops</p>
+        <h2 id="brief-title">The brief</h2>
+        <div class="brief__text" id="brief-text"></div>
+      </div>
+      <aside class="brief__card">
+        <p class="brief__label">What we're hanging</p>
+        <ul class="brief__wanted" id="brief-wanted"></ul>
+        <p class="brief__label">Deadline</p>
+        <p class="brief__deadline" id="brief-deadline">Rolling</p>
+        <p class="brief__fine">Open to everyone, members or not. One to five pieces per drop. No AI-generated art.</p>
+      </aside>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="spot" id="how">
+      <div class="spot__head">
+        <p class="tag">How it works</p>
+        <h2>From your wall to every mailbox</h2>
+      </div>
+      <ol class="spot__steps">
+        <li>
+          <span>1</span>
+          <h3>Make something</h3>
+          <p>Read the brief and make it yours. New work or something you've been sitting on, as long as it comes from the floor.</p>
+        </li>
+        <li>
+          <span>2</span>
+          <h3>Send it in</h3>
+          <p>Upload it below. Tell us your name and where people can find you. Submissions stay in the running for upcoming drops.</p>
+        </li>
+        <li>
+          <span>3</span>
+          <h3>Check your inbox</h3>
+          <p>When your piece is picked for a drop, we'll email you before it goes out. Then it lands in every member's mailbox.</p>
+        </li>
+      </ol>
+      <p class="spot__fine">Featured artists get credit in print, a spot on the wall below and a free copy of the drop.</p>
+    </section>
+
+    <!-- SUBMIT -->
+    <section class="join window" id="submit">
+      <div class="join__card submit">
+        <p class="tag">The drop box</p>
+        <h2>Submit your art</h2>
+        <p>Images up to 20 MB each, up to five at a time. JPG, PNG, WEBP or PDF. Scans and photos of physical pieces are welcome.</p>
+
+        <form class="submit__form" id="submit-form" novalidate>
+          <div class="submit__row">
+            <div class="field">
+              <label for="art-name">Your name</label>
+              <input id="art-name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="art-handle">Instagram or website <span>(optional)</span></label>
+              <input id="art-handle" name="handle" type="text" placeholder="@yourname">
+            </div>
+          </div>
+          <div class="field">
+            <label for="art-email">Email</label>
+            <input id="art-email" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="art-title">What's it called?</label>
+            <input id="art-title" name="title" type="text" required>
+          </div>
+          <div class="field">
+            <label for="art-files">Your work</label>
+            <label class="drop-zone" for="art-files">
+              <input id="art-files" name="files" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple required>
+              <span class="drop-zone__cta">Choose files</span>
+              <span class="drop-zone__list" id="art-file-list" aria-live="polite"></span>
+            </label>
+          </div>
+          <div class="field">
+            <label for="art-note">Anything we should know? <span>(optional)</span></label>
+            <textarea id="art-note" name="note" rows="4" placeholder="What it is, how you made it, the rave that inspired it…"></textarea>
+          </div>
+          <label class="check">
+            <input type="checkbox" name="rights" required>
+            <span>I made this myself, and no AI was used anywhere in creating it. The Zebra Express can print it in a drop and show it on this site and Instagram, with credit. I keep the rights to my work.</span>
+          </label>
+          <button class="btn" type="submit">Send it in</button>
+          <p class="signup__msg" id="submit-msg" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- HOUSE RULES -->
+    <section class="rules" id="rules">
+      <div class="section-head">
+        <p class="tag">Before you send</p>
+        <h2>House rules</h2>
+      </div>
+      <ol class="rules__list">
+        <li><strong>Your own work.</strong> Made by you, or by you and friends who are happy to be credited.</li>
+        <li><strong>No AI.</strong> We don't accept AI-generated art. This one's for human hands only.</li>
+        <li><strong>Keep it PLUR.</strong> Nothing hateful, nothing cruel, nothing that would get you kicked out of a party.</li>
+        <li><strong>Respect the artists.</strong> No other people's logos, artwork or characters passed off as your own.</li>
+        <li><strong>Fit the page.</strong> We might crop or resize to fit the envelope. We won't change the work itself.</li>
+        <li><strong>No guarantees.</strong> We can't feature everything. If it isn't picked, keep sending new work. Every drop is a new theme.</li>
+      </ol>
+    </section>
+
+    <!-- THE WALL -->
+    <section class="evidence" id="wall-section">
+      <div class="section-head">
+        <p class="tag">Hung so far</p>
+        <h2>The wall</h2>
+      </div>
+      <div class="gallery" id="wall"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer__big">Make your <span class="hl">mark</span>.</p>
+    <nav aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="drops.html">Drops</a>
+      <a href="marty.html">Marty</a>
+      <a href="shop.html">Shop</a>
+      <a href="dancefloor.html">Dancefloor</a>
+      <a href="arttent.html" aria-current="page">Submit art</a>
+      <a href="faq.html">FAQ</a>
+      <a href="#privacy" data-modal="privacy">Privacy</a>
+      <a href="index.html#join">Join</a>
+      <a class="footer__ig" href="https://www.instagram.com/thezebraexpress/" rel="noopener" target="_blank">Instagram @thezebraexpress</a>
+    </nav>
+    <p class="footer__fine">© 2026 The Zebra Express.</p>
+  </footer>
+
+    <script src="art-data.js"></script>
+  <script src="arttent.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
