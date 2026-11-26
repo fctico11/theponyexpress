@@ -45,7 +45,7 @@ if (form) form.addEventListener("submit", async (event) => {
       done.querySelector("h2").focus({ preventScroll: true });
       done.scrollIntoView({ behavior: "smooth", block: "center" });
     } else {
-      say("You're on the route. Marty's lacing up.");
+      say("You're on the waitlist. Marty's lacing up.");
     }
   } catch {
     say("That didn't go through. Give it another try in a minute.", true);
@@ -285,6 +285,8 @@ if (input) input.addEventListener("input", () => {
         k2 = 0.5 + 0.5 * sin(3.0 * log(r) - t);
       } else {
         // Warp: fold the plane over itself a few times, then stripe it.
+        // Half speed: a slow, drifting festival visual rather than a busy screensaver.
+        t *= 0.5;
         p += (u_mouse - 0.5) * 0.18;
         for (int i = 1; i < 5; i++) {
           float f = float(i);
